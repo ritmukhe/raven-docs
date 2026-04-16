@@ -1,0 +1,65 @@
+site_name: RAVEN
+site_description: "Ravens see what you can't. Documentation for RAVEN (bgp-routing-security-monitor) — BMP + RPKI ROV + ASPA path validation in a single binary."
+site_url: https://ritmukhe.github.io/raven-docs
+repo_url: https://github.com/nokia/bgp-routing-security-monitor
+repo_name: nokia/bgp-routing-security-monitor
+edit_uri: ""
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: black
+      accent: amber
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/install.md
+    - Quick Start: getting-started/quick-start.md
+    - Concepts: getting-started/concepts.md
+  - User Guide:
+    - Configuration: user-guide/configuration.md
+    - CLI Reference: user-guide/cli-reference.md
+    - Security Postures: user-guide/security-postures.md
+    - Prometheus & Grafana: user-guide/observability.md
+  - Demo Lab:
+    - Overview: lab/overview.md
+    - Attack Scenarios: lab/scenarios.md
+  - Deployment:
+    - Production Setup: deployment/production.md
+    - Scaling: deployment/scaling.md
+  - Troubleshooting: troubleshooting.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - def_list
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/nokia/bgp-routing-security-monitor
