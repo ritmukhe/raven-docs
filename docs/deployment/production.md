@@ -4,6 +4,7 @@ This guide covers deploying RAVEN in a production environment against real
 routers and a production RPKI validator.
 
 ## Architecture
+```
 ┌─────────────────┐     BMP      ┌─────────────────────┐
 │  Edge Router 1  │─────────────▶│                     │
 ├─────────────────┤              │       RAVEN          │
@@ -17,6 +18,7 @@ routers and a production RPKI validator.
 ┌──────────▼──────────┐
 │  Prometheus+Grafana  │
 └─────────────────────┘
+```
 
 ## Step 1 — Install RAVEN
 
