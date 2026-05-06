@@ -706,6 +706,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/active-response/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Active Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -927,6 +955,67 @@
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-3-scenarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3 Scenarios
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 3 Scenarios">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scenario-5-webhook-alert" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 5 — Webhook Alert
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenario-6-flowspec-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 6 — Flowspec Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenario-7-audit-report" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 7 — Audit Report
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenario-8-full-phase-3-sequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 8 — Full Phase 3 Sequence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1182,6 +1271,67 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#phase-3-scenarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3 Scenarios
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 3 Scenarios">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scenario-5-webhook-alert" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 5 — Webhook Alert
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenario-6-flowspec-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 6 — Flowspec Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenario-7-audit-report" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 7 — Audit Report
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenario-8-full-phase-3-sequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 8 — Full Phase 3 Sequence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1230,15 +1380,15 @@ because a ROA exists authorizing only the legitimate origin ASN.</p>
 </code></pre></div>
 <p>What happens:</p>
 <ul>
-<li>The internet router (AS2121) announces <code>193.0.0.0/21</code> — a prefix it does
+<li>The internet router (AS2121) announces <code>192.0.2.0/24</code> — a prefix it does
   not own and has no ROA for</li>
 <li>RAVEN receives this via BMP from the upstream router</li>
 <li>ROV lookup finds a ROA authorizing a different ASN</li>
 <li>RAVEN marks the route <code>origin-invalid</code></li>
 </ul>
 <p><strong>What you will see in <code>raven watch</code>:</strong>
-[14:23:01] NEW  193.0.0.0/21  via 172.20.20.2  AS2121  ROV:Invalid  posture:origin-invalid
-Matched VRP: ROA{193.0.0.0/21, AS65000, maxLength=/21}
+[14:23:01] NEW  192.0.2.0/24  via 10.0.0.1  AS2121  ROV:Invalid  posture:origin-invalid
+Matched VRP: ROA{192.0.2.0/24, AS65000, maxLength=/24}
 Reason: Origin AS2121 not authorized — ROA authorizes AS65000</p>
 <p><strong>What you will see in Grafana:</strong></p>
 <ul>
@@ -1249,7 +1399,7 @@ Reason: Origin AS2121 not authorized — ROA authorizes AS65000</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>raven<span class="w"> </span>routes<span class="w"> </span>--posture<span class="w"> </span>origin-invalid
 </code></pre></div>
 PREFIX          PEER          ORIGIN  ROV      ASPA     POSTURE
-193.0.0.0/21    172.20.20.2   AS2121  Invalid  Unknown  origin-invalid</p>
+192.0.2.0/24    10.0.0.1   AS2121  Invalid  Unknown  origin-invalid</p>
 <p><strong>Clean up:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>hijack-clean
 </code></pre></div>
@@ -1267,14 +1417,14 @@ the AS_PATH contains a hop that violates published provider relationships.</p>
 <ul>
 <li>The upstream router (AS65000) leaks a route it received from the internet
   back to the edge router via an unauthorized path</li>
-<li>The origin ASN is legitimate so ROV passes</li>
+<li>The origin AS1199 (SURFnet) has a valid ROA — so ROV passes</li>
 <li>RAVEN walks the AS_PATH and finds a hop that violates an ASPA record</li>
 <li>RAVEN marks the route <code>path-suspect</code></li>
 </ul>
 <p><strong>What you will see in <code>raven watch</code>:</strong>
-[14:24:15] NEW  10.0.0.0/8  via 172.20.20.2  AS2121  ROV:Valid  ASPA:Invalid  posture:path-suspect
-AS_PATH: [65000 2121 65000]
-Failing hop: AS65000→AS2121 — AS2121 is not in ASPA(AS65000) provider set</p>
+[14:24:15] NEW  145.102.136.0/22  via 10.0.0.1  AS1199  ROV:Valid  ASPA:Invalid  posture:path-suspect
+AS_PATH: [65000 1199]
+Failing hop: AS1199→AS65000 — AS65000 not in AS1199 ASPA provider set (only AS1103)</p>
 <p><strong>What you will see in Grafana:</strong></p>
 <ul>
 <li><code>path-suspect</code> counter jumps from 0 to 1</li>
@@ -1284,7 +1434,7 @@ Failing hop: AS65000→AS2121 — AS2121 is not in ASPA(AS65000) provider set</p
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>raven<span class="w"> </span>routes<span class="w"> </span>--posture<span class="w"> </span>path-suspect
 </code></pre></div>
 PREFIX       PEER          ORIGIN  ROV    ASPA     POSTURE
-10.0.0.0/8   172.20.20.2   AS2121  Valid  Invalid  path-suspect</p>
+145.102.136.0/22   10.0.0.1   AS1199  Valid  Invalid  path-suspect</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>raven<span class="w"> </span>routes<span class="w"> </span>--posture<span class="w"> </span>path-suspect<span class="w"> </span>--format<span class="w"> </span>json
 </code></pre></div>
 <p>The JSON output includes the full <code>aspa</code> field with <code>failing_hop</code> details
@@ -1341,6 +1491,102 @@ becomes a powerful tool for identifying gaps in ASPA coverage.</p>
 <li><code>recommend</code> — show the ASPA recommender output</li>
 <li><code>down</code> — clean shutdown</li>
 </ol>
+<hr />
+<h2 id="phase-3-scenarios">Phase 3 Scenarios</h2>
+<p>These scenarios demonstrate RAVEN's active response capabilities — the Event
+Engine, webhooks, Flowspec lifecycle, and audit report.</p>
+<h3 id="scenario-5-webhook-alert">Scenario 5 — Webhook Alert</h3>
+<p>Shows the Event Engine firing a webhook when a hijack is detected.</p>
+<p><strong>Setup</strong> — start the webhook listener in a second terminal:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>webhook-listen
+</code></pre></div>
+<p><strong>Inject the hijack:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>hijack
+</code></pre></div>
+<p><strong>What you will see in the webhook listener terminal:</strong>
+─── Alert: 2026-05-06 14:23:01 ───
+{
+"type": "new_route",
+"prefix": "192.0.2.0/24",
+"new_posture": "origin-invalid",
+"rov_state": "Invalid",
+"router_id": "10.0.0.1"
+}</p>
+<p>The webhook fires within milliseconds of BMP arrival — before any human
+could have noticed the Grafana dashboard change.</p>
+<p><strong>Clean up:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>hijack-clean
+</code></pre></div>
+<hr />
+<h3 id="scenario-6-flowspec-lifecycle">Scenario 6 — Flowspec Lifecycle</h3>
+<p>Shows the full Flowspec mitigation lifecycle: automatic rule generation,
+dry-run review, live GoBGP injection, and withdrawal.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>flowspec
+</code></pre></div>
+<p>This runs interactively:</p>
+<ol>
+<li>Injects the origin hijack to trigger a Flowspec rule</li>
+<li>Shows the rule in <code>raven flowspec list</code> (dry-run mode)</li>
+<li>Prompts you to toggle to live injection</li>
+<li>Shows the rule in GoBGP after toggle</li>
+<li>Prompts you to withdraw</li>
+<li>Cleans up the hijack</li>
+</ol>
+<p><strong>Key commands demonstrated:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Show active rules</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>raven<span class="w"> </span>flowspec<span class="w"> </span>list
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="c1"># Toggle a rule from dry-run to live GoBGP injection</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>raven<span class="w"> </span>flowspec<span class="w"> </span>toggle<span class="w"> </span><span class="s2">&quot;192.0.2.0/24|drop&quot;</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="c1"># Verify the rule is active in GoBGP</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>clab-raven-demo-gobgp<span class="w"> </span>gobgp<span class="w"> </span>global<span class="w"> </span>rib<span class="w"> </span>-a<span class="w"> </span>ipv4-flowspec
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="c1"># Toggle back to dry-run (withdraw from GoBGP)</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>raven<span class="w"> </span>flowspec<span class="w"> </span>toggle<span class="w"> </span><span class="s2">&quot;192.0.2.0/24|drop&quot;</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code>flowspec</code> case requires the GoBGP sidecar container. Verify it is
+running with <code>docker ps | grep gobgp</code> before running this scenario.</p>
+</div>
+<hr />
+<h3 id="scenario-7-audit-report">Scenario 7 — Audit Report</h3>
+<p>Shows <code>raven audit</code> generating a full security posture report for a router.</p>
+<p><strong>Baseline audit:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>audit
+</code></pre></div>
+<p>This runs <code>raven audit --router 10.0.0.1</code> and shows:</p>
+<ul>
+<li>Total routes and per-posture breakdown</li>
+<li>ROV coverage percentage</li>
+<li>ASPA coverage percentage (0% in the lab — expected)</li>
+<li>Actionable recommendations</li>
+</ul>
+<p><strong>Audit after hijack</strong> — inject the hijack first, then audit:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>hijack
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>raven<span class="w"> </span>audit<span class="w"> </span>--router<span class="w"> </span><span class="m">10</span>.0.0.1
+</code></pre></div>
+<p>The audit now shows 2 origin-invalid routes and names the attacker ASN in
+the top offenders section.</p>
+<p><strong>Audit in different formats:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># JSON output — pipe to your SIEM or ticket system</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>raven<span class="w"> </span>audit<span class="w"> </span>--router<span class="w"> </span><span class="m">10</span>.0.0.1<span class="w"> </span>--format<span class="w"> </span>json
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="c1"># Markdown output — paste into incident post-mortems</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>raven<span class="w"> </span>audit<span class="w"> </span>--router<span class="w"> </span><span class="m">10</span>.0.0.1<span class="w"> </span>--format<span class="w"> </span>markdown
+</code></pre></div>
+<hr />
+<h3 id="scenario-8-full-phase-3-sequence">Scenario 8 — Full Phase 3 Sequence</h3>
+<p>Runs all Phase 3 scenarios automatically in sequence:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>phase3
+</code></pre></div>
+<p>This runs non-interactively:
+1. Origin hijack detection + webhook
+2. Flowspec rule generation + live toggle + GoBGP verification + withdraw
+3. Audit report before and after hijack
+4. Cleanup</p>
+<p>Use this for rehearsing the full Phase 3 demo flow.</p>
 
 
 

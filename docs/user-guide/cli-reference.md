@@ -312,3 +312,111 @@ Show RAVEN version and build information.
 raven version
 ```
 raven version v0.1.0 (commit: abc1234, built: 2026-04-15T00:00:00Z)
+
+---
+
+## raven audit
+
+Generate a read-only security posture report for a router. Shows ROV/ASPA
+coverage, per-peer posture breakdown, top offending ASNs, and actionable
+recommendations.
+
+```bash
+raven audit --router 10.0.0.1
+raven audit --router 10.0.0.1 --format json
+raven audit --router 10.0.0.1 --format markdown
+```
+
+**Flags:**
+
+| Flag | Description |
+|---|---|
+| `--router` | Peer IP address to audit (required) |
+| `--format` | Output format: `table`, `json`, or `markdown` |
+
+**Example output:**
+Router: 10.0.0.1
+Total Routes: 5
+ROV Coverage:  80.0%
+ASPA Coverage: 0.0%
+POSTURE          COUNT
+origin-only      3   (60%)
+unverified       1   (20%)
+origin-invalid   1   (20%)
+TOP OFFENDERS
+AS65001   1 route   origin-invalid   10.10.0.0/24
+RECOMMENDATIONS
+
+1 origin-invalid route — run raven what-if --reject-invalid
+ASPA coverage 0% — register ASPA objects at your RIR
+
+
+!!! tip
+    Run `raven audit` weekly in a cron job with `--format json` to track
+    your security posture over time. Use `--format markdown` for NOC reports
+    and incident post-mortems.
+
+---
+
+## raven flowspec list
+
+Show all active Flowspec mitigation rules in RAVEN's registry. Displays
+the rule key, action, dry-run state, remaining TTL, and insertion time.
+
+```bash
+raven flowspec list
+raven flowspec list --format json
+```
+
+**Flags:**
+
+| Flag | Description |
+|---|---|
+| `--format` | Output format: `table` or `json` |
+
+**Example output:**
+RAVEN Flowspec Rules
+════════════════════════════════════════════════════════
+KEY                            ACTION  DRY-RUN  TTL        INSERTED
+192.0.2.0/24|drop              drop    yes      4m50s      2026-05-06 14:23:01
+10.10.0.0/24|drop              drop    yes      3m55s      2026-05-06 14:24:23
+2 active rules  (dry-run mode — no live injection)
+
+Rules are created automatically by the Event Engine when a route matches
+a configured `flowspec` action. Rules in `dry-run` mode are tracked but
+not injected into GoBGP until toggled live with `raven flowspec toggle`.
+
+---
+
+## raven flowspec toggle
+
+Toggle a Flowspec rule between dry-run and live GoBGP injection. When
+toggled to live, RAVEN calls GoBGP's AddPath API to inject the rule.
+Toggle again to withdraw and return to dry-run.
+
+```bash
+raven flowspec toggle "192.0.2.0/24|drop"
+```
+
+**Arguments:**
+
+| Argument | Description |
+|---|---|
+| `<key>` | Rule key as shown in `raven flowspec list` (required) |
+
+**Example — toggling to live:**
+Rule: 192.0.2.0/24|drop
+Dry-run: yes → LIVE
+⚠  Live injection enabled. Flowspec rule is now active in GoBGP.
+Run 'raven flowspec toggle "192.0.2.0/24|drop"' again to
+withdraw and return to dry-run mode.
+
+**Example — withdrawing:**
+Rule: 192.0.2.0/24|drop
+Dry-run: LIVE → yes (withdrawn from GoBGP)
+
+!!! warning
+    Live injection sends a Flowspec route to GoBGP which will propagate
+    it to any configured BGP peers. Only toggle to live when you intend
+    to apply the mitigation. The rule will auto-expire after the
+    configured TTL (default: 5 minutes).

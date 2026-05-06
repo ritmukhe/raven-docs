@@ -47,15 +47,15 @@ bash lab/demo-master.sh hijack
 
 What happens:
 
-- The internet router (AS2121) announces `193.0.0.0/21` — a prefix it does
+- The internet router (AS2121) announces `192.0.2.0/24` — a prefix it does
   not own and has no ROA for
 - RAVEN receives this via BMP from the upstream router
 - ROV lookup finds a ROA authorizing a different ASN
 - RAVEN marks the route `origin-invalid`
 
 **What you will see in `raven watch`:**
-[14:23:01] NEW  193.0.0.0/21  via 172.20.20.2  AS2121  ROV:Invalid  posture:origin-invalid
-Matched VRP: ROA{193.0.0.0/21, AS65000, maxLength=/21}
+[14:23:01] NEW  192.0.2.0/24  via 10.0.0.1  AS2121  ROV:Invalid  posture:origin-invalid
+Matched VRP: ROA{192.0.2.0/24, AS65000, maxLength=/24}
 Reason: Origin AS2121 not authorized — ROA authorizes AS65000
 
 **What you will see in Grafana:**
@@ -69,7 +69,7 @@ Reason: Origin AS2121 not authorized — ROA authorizes AS65000
 raven routes --posture origin-invalid
 ```
 PREFIX          PEER          ORIGIN  ROV      ASPA     POSTURE
-193.0.0.0/21    172.20.20.2   AS2121  Invalid  Unknown  origin-invalid
+192.0.2.0/24    10.0.0.1   AS2121  Invalid  Unknown  origin-invalid
 
 **Clean up:**
 
@@ -98,14 +98,14 @@ What happens:
 
 - The upstream router (AS65000) leaks a route it received from the internet
   back to the edge router via an unauthorized path
-- The origin ASN is legitimate so ROV passes
+- The origin AS1199 (SURFnet) has a valid ROA — so ROV passes
 - RAVEN walks the AS_PATH and finds a hop that violates an ASPA record
 - RAVEN marks the route `path-suspect`
 
 **What you will see in `raven watch`:**
-[14:24:15] NEW  10.0.0.0/8  via 172.20.20.2  AS2121  ROV:Valid  ASPA:Invalid  posture:path-suspect
-AS_PATH: [65000 2121 65000]
-Failing hop: AS65000→AS2121 — AS2121 is not in ASPA(AS65000) provider set
+[14:24:15] NEW  145.102.136.0/22  via 10.0.0.1  AS1199  ROV:Valid  ASPA:Invalid  posture:path-suspect
+AS_PATH: [65000 1199]
+Failing hop: AS1199→AS65000 — AS65000 not in AS1199 ASPA provider set (only AS1103)
 
 **What you will see in Grafana:**
 
@@ -118,7 +118,7 @@ Failing hop: AS65000→AS2121 — AS2121 is not in ASPA(AS65000) provider set
 raven routes --posture path-suspect
 ```
 PREFIX       PEER          ORIGIN  ROV    ASPA     POSTURE
-10.0.0.0/8   172.20.20.2   AS2121  Valid  Invalid  path-suspect
+145.102.136.0/22   10.0.0.1   AS1199  Valid  Invalid  path-suspect
 
 ```bash
 raven routes --posture path-suspect --format json
@@ -207,3 +207,142 @@ For conference presentations, run the scenarios in this order:
 8. `whatif` — show the policy impact simulation
 9. `recommend` — show the ASPA recommender output
 10. `down` — clean shutdown
+
+---
+
+## Phase 3 Scenarios
+
+These scenarios demonstrate RAVEN's active response capabilities — the Event
+Engine, webhooks, Flowspec lifecycle, and audit report.
+
+### Scenario 5 — Webhook Alert
+
+Shows the Event Engine firing a webhook when a hijack is detected.
+
+**Setup** — start the webhook listener in a second terminal:
+
+```bash
+bash lab/demo-master.sh webhook-listen
+```
+
+**Inject the hijack:**
+
+```bash
+bash lab/demo-master.sh hijack
+```
+
+**What you will see in the webhook listener terminal:**
+─── Alert: 2026-05-06 14:23:01 ───
+{
+"type": "new_route",
+"prefix": "192.0.2.0/24",
+"new_posture": "origin-invalid",
+"rov_state": "Invalid",
+"router_id": "10.0.0.1"
+}
+
+The webhook fires within milliseconds of BMP arrival — before any human
+could have noticed the Grafana dashboard change.
+
+**Clean up:**
+
+```bash
+bash lab/demo-master.sh hijack-clean
+```
+
+---
+
+### Scenario 6 — Flowspec Lifecycle
+
+Shows the full Flowspec mitigation lifecycle: automatic rule generation,
+dry-run review, live GoBGP injection, and withdrawal.
+
+```bash
+bash lab/demo-master.sh flowspec
+```
+
+This runs interactively:
+
+1. Injects the origin hijack to trigger a Flowspec rule
+2. Shows the rule in `raven flowspec list` (dry-run mode)
+3. Prompts you to toggle to live injection
+4. Shows the rule in GoBGP after toggle
+5. Prompts you to withdraw
+6. Cleans up the hijack
+
+**Key commands demonstrated:**
+
+```bash
+# Show active rules
+raven flowspec list
+
+# Toggle a rule from dry-run to live GoBGP injection
+raven flowspec toggle "192.0.2.0/24|drop"
+
+# Verify the rule is active in GoBGP
+docker exec clab-raven-demo-gobgp gobgp global rib -a ipv4-flowspec
+
+# Toggle back to dry-run (withdraw from GoBGP)
+raven flowspec toggle "192.0.2.0/24|drop"
+```
+
+!!! warning
+    The `flowspec` case requires the GoBGP sidecar container. Verify it is
+    running with `docker ps | grep gobgp` before running this scenario.
+
+---
+
+### Scenario 7 — Audit Report
+
+Shows `raven audit` generating a full security posture report for a router.
+
+**Baseline audit:**
+
+```bash
+bash lab/demo-master.sh audit
+```
+
+This runs `raven audit --router 10.0.0.1` and shows:
+
+- Total routes and per-posture breakdown
+- ROV coverage percentage
+- ASPA coverage percentage (0% in the lab — expected)
+- Actionable recommendations
+
+**Audit after hijack** — inject the hijack first, then audit:
+
+```bash
+bash lab/demo-master.sh hijack
+raven audit --router 10.0.0.1
+```
+
+The audit now shows 2 origin-invalid routes and names the attacker ASN in
+the top offenders section.
+
+**Audit in different formats:**
+
+```bash
+# JSON output — pipe to your SIEM or ticket system
+raven audit --router 10.0.0.1 --format json
+
+# Markdown output — paste into incident post-mortems
+raven audit --router 10.0.0.1 --format markdown
+```
+
+---
+
+### Scenario 8 — Full Phase 3 Sequence
+
+Runs all Phase 3 scenarios automatically in sequence:
+
+```bash
+bash lab/demo-master.sh phase3
+```
+
+This runs non-interactively:
+1. Origin hijack detection + webhook
+2. Flowspec rule generation + live toggle + GoBGP verification + withdraw
+3. Audit report before and after hijack
+4. Cleanup
+
+Use this for rehearsing the full Phase 3 demo flow.

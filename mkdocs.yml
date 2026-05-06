@@ -35,6 +35,7 @@ nav:
     - CLI Reference: user-guide/cli-reference.md
     - Security Postures: user-guide/security-postures.md
     - Prometheus & Grafana: user-guide/observability.md
+    - Active Response: user-guide/active-response.md
   - Demo Lab:
     - Overview: lab/overview.md
     - Attack Scenarios: lab/scenarios.md

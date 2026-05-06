@@ -154,3 +154,155 @@ Or set it permanently:
 api:
   listen: "192.0.2.10:11020"
 ```
+
+---
+
+## Events Configuration
+
+The `events` section configures the Event Engine — rules that trigger actions
+when route postures change.
+
+```yaml
+events:
+  rules:
+    - name: "alert-origin-invalid"
+      trigger:
+        type: posture_change
+        postures: ["origin-invalid"]
+      cooldown: 60s
+      actions:
+        - type: log
+          level: warn
+        - type: webhook
+          url: "https://hooks.example.com/raven"
+          secret: "your-hmac-secret"
+          max_attempts: 3
+          timeout: 5s
+        - type: flowspec
+          gobgp_address: "localhost:50051"
+          dry_run: true
+          ttl: 5m
+          rule_action: drop
+          max_rules: 100
+          reaper_interval: 30s
+
+    - name: "alert-route-leak"
+      trigger:
+        type: posture_change
+        postures: ["path-suspect"]
+      cooldown: 60s
+      actions:
+        - type: log
+          level: warn
+        - type: webhook
+          url: "https://hooks.example.com/raven"
+```
+
+**Trigger types:**
+
+| Type | Description |
+|---|---|
+| `posture_change` | Fires when a route's posture changes to one of the listed values |
+| `new_route` | Fires when a new route arrives with one of the listed postures |
+| `cache_unhealthy` | Fires when an RTR cache becomes unreachable |
+
+**Action types:**
+
+| Type | Description |
+|---|---|
+| `log` | Log the event at the specified level |
+| `webhook` | HTTP POST with JSON payload, HMAC-SHA256 signed |
+| `flowspec` | Generate a Flowspec drop rule, inject via GoBGP |
+
+**Cooldown** — Minimum time between repeated firings of the same rule for the
+same prefix+peer combination. Prevents alert storms during flapping.
+
+**Webhook payload** — The JSON body sent to your webhook URL:
+
+```json
+{
+  "id": "b65b80a6-...",
+  "timestamp": "2026-05-06T14:23:01Z",
+  "type": "posture_change",
+  "prefix": "192.0.2.0/24",
+  "peer_addr": "10.0.0.1",
+  "peer_asn": 65000,
+  "old_posture": "origin-only",
+  "new_posture": "origin-invalid",
+  "rov_state": "Invalid",
+  "aspa_state": "Unknown",
+  "router_id": "10.0.0.1"
+}
+```
+
+**Flowspec options:**
+
+| Option | Default | Description |
+|---|---|---|
+| `gobgp_address` | `localhost:50051` | GoBGP gRPC management endpoint |
+| `dry_run` | `true` | Log rules without injecting into GoBGP |
+| `ttl` | `1h` | Per-rule lifetime before auto-expiry |
+| `rule_action` | `drop` | Flowspec action: `drop` or `rate-limit` |
+| `max_rules` | `100` | Maximum concurrently active rules |
+| `reaper_interval` | `30s` | How often to check for and expire TTL'd rules |
+| `approval_webhook` | — | URL to POST proposed rules to before injecting |
+
+!!! tip
+    Always start with `dry_run: true`. Use `raven flowspec list` to review
+    generated rules, then toggle specific rules live with
+    `raven flowspec toggle "<key>"` when you are confident they are correct.
+
+---
+
+## Snapshot Configuration
+
+The `snapshot` section configures warm-start persistence — saving the route
+table and RPKI cache to disk so RAVEN can restore state quickly on restart.
+
+```yaml
+snapshot:
+  enabled: true
+  path: "/var/lib/raven/snapshot.json"
+  stale_timeout: 5m        # How long restored routes are marked stale
+```
+
+**Options:**
+
+| Option | Default | Description |
+|---|---|---|
+| `enabled` | `false` | Enable snapshot save/restore |
+| `path` | `raven-snapshot.json` | File path for the snapshot |
+| `stale_timeout` | `5m` | Routes restored from snapshot are marked stale and evicted after this duration if not refreshed via BMP |
+
+Without snapshots, RAVEN rebuilds its route table from BMP table dumps on
+restart (typically 30–90 seconds). With snapshots, the route table is
+available immediately on startup while BMP reconnects in the background.
+
+---
+
+## OpenTelemetry Configuration
+
+The `otel` section configures OTLP metrics export alongside Prometheus.
+
+```yaml
+otel:
+  enabled: true
+  endpoint: "http://otel-collector:4318"
+  protocol: http               # http | grpc
+  interval: 30s
+  service_name: "raven"
+```
+
+**Options:**
+
+| Option | Default | Description |
+|---|---|---|
+| `enabled` | `false` | Enable OpenTelemetry export |
+| `endpoint` | `http://localhost:4318` | OTLP collector endpoint |
+| `protocol` | `http` | Export protocol: `http` or `grpc` |
+| `interval` | `30s` | Metrics export interval |
+| `service_name` | `raven` | Service name in OTLP resource attributes |
+
+RAVEN exports the same metrics via OTLP as via Prometheus. Both outputs
+can be active simultaneously. RAVEN continues normally if the OTLP
+collector is unreachable — export failures are logged but not fatal.

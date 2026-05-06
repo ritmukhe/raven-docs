@@ -1,5 +1,4 @@
 # RAVEN
-
 **Ravens see what you can't.**
 
 *Documentation for RAVEN (bgp-routing-security-monitor) — BMP + RPKI ROV + ASPA path validation in a single binary.*
@@ -37,7 +36,12 @@ raven routes --posture origin-invalid
 | **Combined Posture** | Unified security posture per route (Secured / Path-Suspect / Origin-Invalid / ...) |
 | **What-If** | Simulate impact of deploying reject-invalid or ASPA enforcement |
 | **ASPA Recommender** | Suggest ASPA objects based on observed AS_PATHs |
+| **Event Engine** | Trigger webhooks and Flowspec rules on posture changes |
+| **Flowspec** | Automated mitigation — detect, generate, inject, expire via GoBGP |
+| **raven audit** | Read-only security posture report per router |
+| **Warm-start** | Snapshot and restore route table across restarts |
 | **Prometheus** | `/metrics` endpoint for Grafana dashboards |
+| **OpenTelemetry** | OTLP metrics export alongside Prometheus |
 | **Single Binary** | Zero dependencies — download and run |
 
 ## Why Now?
@@ -50,6 +54,7 @@ ASPA has crossed into production availability — ARIN enabled ASPA object creat
 - [Quick Start](getting-started/quick-start.md) — first annotated route in minutes
 - [Concepts](getting-started/concepts.md) — BMP, ROV, ASPA explained
 - [Demo Lab](lab/overview.md) — run the full stack on your laptop
+- [Active Response](user-guide/active-response.md) — webhooks, Flowspec, event engine
 
 ## Project
 
