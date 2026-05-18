@@ -1,8 +1,18 @@
 # Attack Scenarios
 
-The demo lab includes three scripted scenarios that demonstrate RAVEN's
-detection capabilities in real time. Run these after `demo-master.sh setup`
-completes.
+The demo lab includes scripted scenarios that demonstrate RAVEN's detection
+capabilities in real time. Run these after `demo-master.sh setup` completes.
+
+## Running the Full Conference Demo
+
+To run all scenarios in sequence with narrated pauses:
+
+```bash
+./demo-master.sh lacnic
+```
+
+This runs the complete 6-scenario LACNIC demo sequence: baseline, origin
+hijack, stealthy hijack, route leak, RTR cache failure, and audit report.
 
 ## Baseline
 
@@ -135,7 +145,85 @@ bash lab/demo-master.sh leak-clean
 
 ---
 
-## Scenario 3 — What-If Simulation
+## Scenario 3 — Stealthy Hijack
+
+**What it demonstrates:** A more-specific prefix announcement that diverts
+traffic while the control plane appears clean. Detected only via data-plane
+probing.
+
+**Mechanism:** The attacker (AS65099) announces `203.0.113.0/25` — a
+more-specific of the legitimate AS65000 /24. The edge router installs it via
+LPM. RAVEN's BMP RIB for the /24 still shows AS65000 as origin — the control
+plane looks clean. Only `raven check stealthy` reveals the divergence.
+
+**Run:**
+
+```bash
+./demo-master.sh stealthy
+```
+
+**What RAVEN shows:**
+Control plane (BMP/RIB):
+  Route    : 203.0.113.0/24 via AS65000 (origin-only)
+  RIB state: CLEAN — ROV Valid, no path violations
+Data plane probe (traceroute from clab-raven-demo-edge):
+  Probe 1  : TTL-exceeded at 10.0.3.2 (AS65099 — ATTACKER)
+  Probe 2  : TTL-exceeded at 10.0.3.2 (AS65099 — ATTACKER)
+  Probe 3  : TTL-exceeded at 10.0.3.2 (AS65099 — ATTACKER)
+╔═════════════════════════════════════════════════════════╗
+║ STEALTHY HIJACK DETECTED: control/data-plane divergence ║
+║ RIB says: AS65000 │ Traffic goes to: AS65099            ║
+╚═════════════════════════════════════════════════════════╝
+
+**Why this matters:** This is the attack class documented in NDSS 2026
+research and confirmed in the AS37100 incident (February 2025). BGP looking
+glasses, route collectors, and RPKI dashboards all show a clean network.
+Only data-plane probing correlated with BMP state reveals the compromise.
+
+**Clean up:**
+
+```bash
+./demo-master.sh stealthy-clean
+```
+
+---
+
+## Scenario 4 — RTR Cache Failure
+
+**What it demonstrates:** RPKI validator unavailability and RAVEN's behavior
+during cache staleness.
+
+**Mechanism:** Routinator is killed. RAVEN detects the RTR session failure,
+continues serving the last known RPKI state, and exposes staleness metrics
+via Prometheus. Routinator is then restored and the session reconnects
+automatically.
+
+**Run:**
+
+```bash
+./demo-master.sh rtr-fail
+```
+
+**What RAVEN shows:**
+
+After Routinator goes offline:
+raven_rtr_session_state{cache="localhost:3323"} 0
+raven_rtr_last_sync_seconds{cache="localhost:3323"} 1747600000
+raven_rtr_vrp_count{cache="localhost:3323"} 870026
+
+The route table continues to show correct validation results based on the
+last known VRP and ASPA state. No routes are incorrectly accepted during
+the outage.
+
+**Why this matters:** Most routers default to fail-open on RTR expiry — they
+stop enforcing ROV when the cache expires. RAVEN gives you advance warning:
+monitor `raven_rtr_session_state` and alert when it hits 0.
+`raven_rtr_last_sync_seconds` tells you exactly when the last successful
+sync occurred.
+
+---
+
+## Scenario 5 — What-If Simulation
 
 This scenario does not inject any attack. It shows the operator impact of
 deploying routing security policies against the current route table.
@@ -169,7 +257,7 @@ missing ASPA objects — which is the current state of the internet.
 
 ---
 
-## Scenario 4 — ASPA Recommender
+## Scenario 6 — ASPA Recommender
 
 Analyse observed AS_PATHs and generate ASPA object suggestions:
 
@@ -202,11 +290,15 @@ For conference presentations, run the scenarios in this order:
 3. Open Grafana and `raven watch` side by side
 4. `hijack` — inject the hijack, show real-time detection
 5. `hijack-clean` — clean up, show the route disappearing
-6. `leak` — inject the route leak, explain why ROV misses it but ASPA catches it
-7. `leak-clean` — clean up
-8. `whatif` — show the policy impact simulation
-9. `recommend` — show the ASPA recommender output
-10. `down` — clean shutdown
+6. `stealthy` — announce a more-specific from the attacker, show `raven check stealthy`
+   revealing the control/data-plane divergence
+7. `stealthy-clean` — withdraw the more-specific
+8. `leak` — inject the route leak, explain why ROV misses it but ASPA catches it
+9. `leak-clean` — clean up
+10. `rtr-fail` — kill Routinator, show staleness metrics and graceful behavior
+11. `whatif` — show the policy impact simulation
+12. `recommend` — show the ASPA recommender output
+13. `down` — clean shutdown
 
 ---
 
@@ -215,7 +307,7 @@ For conference presentations, run the scenarios in this order:
 These scenarios demonstrate RAVEN's active response capabilities — the Event
 Engine, webhooks, Flowspec lifecycle, and audit report.
 
-### Scenario 5 — Webhook Alert
+### Scenario 7 — Webhook Alert
 
 Shows the Event Engine firing a webhook when a hijack is detected.
 
@@ -252,7 +344,7 @@ bash lab/demo-master.sh hijack-clean
 
 ---
 
-### Scenario 6 — Flowspec Lifecycle
+### Scenario 8 — Flowspec Lifecycle
 
 Shows the full Flowspec mitigation lifecycle: automatic rule generation,
 dry-run review, live GoBGP injection, and withdrawal.
@@ -292,7 +384,7 @@ raven flowspec toggle "192.0.2.0/24|drop"
 
 ---
 
-### Scenario 7 — Audit Report
+### Scenario 9 — Audit Report
 
 Shows `raven audit` generating a full security posture report for a router.
 
@@ -331,7 +423,7 @@ raven audit --router 10.0.0.1 --format markdown
 
 ---
 
-### Scenario 8 — Full Phase 3 Sequence
+### Scenario 10 — Full Phase 3 Sequence
 
 Runs all Phase 3 scenarios automatically in sequence:
 

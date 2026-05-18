@@ -358,6 +358,82 @@ ASPA coverage 0% — register ASPA objects at your RIR
 
 ---
 
+## raven check stealthy
+
+Detects stealthy BGP hijacks by comparing the control-plane BMP RIB view
+against actual data-plane forwarding using probes. A diverging first-hop ASN
+indicates traffic is being routed through a different network than BGP
+advertises — invisible to the control plane alone.
+
+```bash
+raven check stealthy --prefix 203.0.113.0/24
+raven check stealthy --prefix 203.0.113.0/24 --probe-via clab-raven-demo-edge
+raven check stealthy --prefix 203.0.113.0/24 --probe-count 5 --timeout 5s
+raven check stealthy --prefix 203.0.113.0/24 --format json
+```
+
+**Flags:**
+
+| Flag | Default | Description |
+|---|---|---|
+| `--prefix` | required | Prefix to probe (CIDR) |
+| `--probe-count` | 3 | Number of probes to send |
+| `--timeout` | 3s | Probe timeout per probe |
+| `--probe-via` | — | Run traceroute from inside a Docker container (for topologies where the host is outside BGP forwarding) |
+| `--format` | table | Output format: `table` or `json` |
+
+**Verdicts:**
+
+| Verdict | Meaning |
+|---|---|
+| `CLEAN` | Data-plane first hop matches BMP RIB expected AS |
+| `STEALTHY HIJACK DETECTED` | First hop AS differs from BMP RIB — traffic diverted |
+| `DIVERGENCE` | First hop not in BMP peer table — unconfirmed divergence |
+| `INCONCLUSIVE` | All probes timed out |
+
+**Example — clean baseline:**
+$ raven check stealthy --prefix 203.0.113.0/24 --probe-via clab-raven-demo-edge
+Checking control/data-plane divergence for 203.0.113.0/24...
+Control plane (BMP/RIB):
+  Route    : 203.0.113.0/24 via AS65000 (origin-only)
+  RIB state: CLEAN — ROV Valid, no path violations
+Data plane probe (traceroute from clab-raven-demo-edge to 203.0.113.1):
+  Probe 1  : TTL-exceeded at 10.0.0.1 (AS65000 — expected)
+  Probe 2  : TTL-exceeded at 10.0.0.1 (AS65000 — expected)
+  Probe 3  : TTL-exceeded at 10.0.0.1 (AS65000 — expected)
+╔══════════════════════════════════════════════════════╗
+║ CLEAN: Data-plane path matches BMP RIB               ║
+║ RIB says: AS65000 │ Traffic goes to: AS65000         ║
+╚══════════════════════════════════════════════════════╝
+
+**Example — stealthy hijack detected:**
+$ raven check stealthy --prefix 203.0.113.0/24 --probe-via clab-raven-demo-edge
+Checking control/data-plane divergence for 203.0.113.0/24...
+Control plane (BMP/RIB):
+  Route    : 203.0.113.0/24 via AS65000 (origin-only)
+  RIB state: CLEAN — ROV Valid, no path violations
+Data plane probe (traceroute from clab-raven-demo-edge to 203.0.113.1):
+  Probe 1  : TTL-exceeded at 10.0.3.2 (AS65099 — ATTACKER)
+  Probe 2  : TTL-exceeded at 10.0.3.2 (AS65099 — ATTACKER)
+  Probe 3  : TTL-exceeded at 10.0.3.2 (AS65099 — ATTACKER)
+╔═════════════════════════════════════════════════════════╗
+║ STEALTHY HIJACK DETECTED: control/data-plane divergence ║
+║ RIB says: AS65000 │ Traffic goes to: AS65099            ║
+╚═════════════════════════════════════════════════════════╝
+
+**Note on permissions:** Raw ICMP requires `CAP_NET_RAW` or root. Grant it
+without sudo:
+
+```bash
+sudo setcap cap_net_raw=eip ./raven
+```
+
+If ICMP fails, RAVEN automatically falls back to TCP SYN probes on port 80.
+Use `--probe-via` to run probes from inside a container that is part of the
+BGP topology.
+
+---
+
 ## raven flowspec list
 
 Show all active Flowspec mitigation rules in RAVEN's registry. Displays

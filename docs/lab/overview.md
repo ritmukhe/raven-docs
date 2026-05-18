@@ -5,35 +5,40 @@ security stack on your laptop. This is the same lab used for conference demos.
 
 ## What the Lab Gives You
 
-- Three FRR routers simulating a real network topology
+- Four FRR routers simulating a real network topology (including an attacker node)
 - Live BGP sessions with BMP streaming to RAVEN
 - Routinator serving real RPKI data including ASPA objects
 - Prometheus and Grafana with pre-built dashboards
 - Scripted attack scenarios — origin hijack, route leak, what-if simulation
 
 ## Topology
+
+The lab topology consists of four FRR routers and RAVEN connected via
+Containerlab:
                 Internet (AS2121)
-                193.0.0.0/21
-                     │
-                     │ eBGP
-                     ▼
-                Upstream (AS65000)
-                10.0.0.0/8
-                     │
-                     │ eBGP + BMP → RAVEN
-                     ▼
-                Edge (AS65001)
-                172.16.0.0/12
+                       │ eBGP
+                       ▼
+        Upstream (AS65000) ─── eBGP ─── Attacker (AS65099)
+                       │ eBGP                           │ eBGP
+                       ▼                                │
+                Edge (AS65001) ──────────────────────────┘
+                       │ BMP (pre-policy)
+                       ▼
+                     RAVEN ◄── RTR ── Routinator
+                       │
+                       ▼
+              Prometheus + Grafana
 
-- **Internet (AS2121)** — simulates the upstream internet, announces
-  `193.0.0.0/21`. Used as the attacker in hijack scenarios.
-- **Upstream (AS65000)** — your upstream provider, announces `10.0.0.0/8`.
-  Sends BMP to RAVEN.
-- **Edge (AS65001)** — your edge router, announces `172.16.0.0/12`.
-  Sends BMP to RAVEN.
+| Node | ASN | Role |
+|---|---|---|
+| internet | AS2121 | Originates `193.0.0.0/21` (RIPE NCC prefix, real ASPA record) |
+| upstream | AS65000 | Transit provider, sends post-policy BMP to RAVEN |
+| edge | AS65001 | Edge router, sends pre-policy BMP to RAVEN |
+| attacker | AS65099 | Peered with upstream and edge, announces nothing at rest |
 
-RAVEN sees everything the edge router receives from upstream, and everything
-upstream receives from the internet.
+The attacker node is used for origin hijack (Scenario 2), stealthy hijack
+(Scenario 3), and the route leak uses the internet router's real ASPA record
+(AS2121, providers: AS3333 only) to produce a genuine ASPA:Invalid result.
 
 ## Prerequisites
 
