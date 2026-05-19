@@ -78,6 +78,19 @@ For ASPA support, you need **Routinator** with RTR v2 enabled:
 routinator server --enable-aspa --rtr 127.0.0.1:3323
 ```
 
+### Docker
+
+A Docker image is available at `nlnetlabs/routinator:latest`:
+
+```bash
+docker run -d --name routinator \
+  -p 3323:3323 \
+  nlnetlabs/routinator:latest \
+  server --enable-aspa --rtr 0.0.0.0:3323
+```
+
+Point RAVEN at `localhost:3323` in your RTR config.
+
 !!! note
     Routinator takes approximately 4 minutes for a cold start while it syncs
     the RPKI repository. Subsequent starts use a warm cache and take around
