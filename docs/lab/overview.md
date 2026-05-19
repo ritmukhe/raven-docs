@@ -44,12 +44,37 @@ The attacker node is used for origin hijack (Scenario 2), stealthy hijack
 
 - **Containerlab** — [install guide](https://containerlab.dev/install/)
 - **Docker** — running and accessible without sudo (or use sudo)
-- **Routinator** — installed as a native binary (not Docker)
+- **Routinator** — native binary or Docker (see Installing Routinator below)
 - **RAVEN** — built from source or installed via go install
 - **Prometheus** — Docker container
 - **Grafana** — Docker container
 
 ## Installing Routinator
+
+### Docker
+
+A Docker image is available at `nlnetlabs/routinator:latest`. Save the following as `~/.routinator.conf`:
+
+```toml
+repository-dir = "/home/routinator/.rpki-cache/repository"
+rtr-listen = ["0.0.0.0:3323"]
+http-listen = ["0.0.0.0:8323"]
+disable-rsync = true
+enable-aspa = true
+```
+
+Then start the container:
+
+```bash
+docker run -d --name routinator \
+  -p 3323:3323 \
+  -v ~/.routinator.conf:/home/routinator/.routinator.conf:ro \
+  -v ~/.rpki-cache:/home/routinator/.rpki-cache \
+  nlnetlabs/routinator:latest \
+  server
+```
+
+### Native Binary
 
 ```bash
 # Install via cargo
