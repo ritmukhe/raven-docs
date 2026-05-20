@@ -2,7 +2,7 @@
 
 RAVEN's Phase 3 capabilities move beyond observation into automated response.
 The Event Engine evaluates configurable rules on every posture change and
-triggers actions — webhooks, logs, and Flowspec mitigation rules.
+triggers actions: webhooks, logs, and Flowspec mitigation rules.
 
 ---
 
@@ -31,14 +31,14 @@ events:
           ttl: 5m
 ```
 
-**Trigger** — what causes the rule to fire. `posture_change` fires when a
+**Trigger**: what causes the rule to fire. `posture_change` fires when a
 route transitions to one of the listed postures. The trigger also fires for
 new routes arriving with a matching posture.
 
-**Cooldown** — minimum time between firings for the same prefix+peer
+**Cooldown**: minimum time between firings for the same prefix+peer
 combination. Prevents alert storms during route flapping. Default: 60s.
 
-**Actions** — what happens when the rule fires. Multiple actions can be
+**Actions**: what happens when the rule fires. Multiple actions can be
 listed; they execute in order. If one action fails, subsequent actions
 still run.
 
@@ -46,9 +46,117 @@ still run.
 
 | Type | Description |
 |---|---|
-| `posture_change` | Route posture changes to one of the listed values |
-| `new_route` | New route arrives with one of the listed postures |
+| `posture` | Route currently has one of the listed postures (steady-state) |
+| `posture_change` | Route posture transitions *to* one of the listed postures |
+| `prefix` | Route prefix falls within (or equals) the configured supernet |
 | `cache_unhealthy` | RTR cache becomes unreachable |
+| `compound` | AND/OR composition of any of the above trigger types |
+
+`posture` evaluates current state on every event; it fires even if the posture has not changed. `posture_change` fires only on transitions: when `old_posture != new_posture` and the new posture matches. Use `posture_change` for alerting (avoids re-firing on every update for a route that is already in a bad state); use `posture` inside compound triggers when you need to combine a steady-state check with another condition.
+
+### Compound Triggers
+
+A compound trigger combines multiple sub-triggers with boolean AND or OR logic. Use it to narrow a broad trigger to a specific prefix scope, or to merge several independent conditions into a single rule.
+
+```yaml
+trigger:
+  type: compound
+  operator: and          # "and": all must match, "or": any must match
+  triggers:
+    - type: posture_change
+      postures: ["origin-invalid"]
+    - type: prefix
+      prefix: "192.0.2.0/24"
+```
+
+This fires only when a route that falls within `192.0.2.0/24` transitions to `origin-invalid`. A hijack on an unrelated prefix leaves this rule silent.
+
+**Operator semantics:**
+
+| Operator | Fires when |
+|---|---|
+| `and` | Every sub-trigger matches (intersection) |
+| `or` | At least one sub-trigger matches (union) |
+
+Sub-triggers can themselves be compound; nesting is fully supported:
+
+```yaml
+trigger:
+  type: compound
+  operator: or
+  triggers:
+    - type: posture_change
+      postures: ["origin-invalid"]
+    - type: compound
+      operator: and
+      triggers:
+        - type: posture_change
+          postures: ["path-suspect"]
+        - type: prefix
+          prefix: "10.0.0.0/8"
+```
+
+Fires on any `origin-invalid` event, *or* when a `path-suspect` event lands within `10.0.0.0/8`.
+
+#### Recipes
+
+**Alert only on your own address space:**
+
+```yaml
+- name: "alert-own-prefix-hijack"
+  trigger:
+    type: compound
+    operator: and
+    triggers:
+      - type: posture_change
+        postures: ["origin-invalid"]
+      - type: prefix
+        prefix: "203.0.113.0/24"
+  cooldown: 60s
+  actions:
+    - type: log
+      level: error
+    - type: webhook
+      url: "https://hooks.example.com/critical"
+```
+
+**Fan-in: alert on route threat or RPKI cache failure under one rule:**
+
+```yaml
+- name: "alert-any-threat"
+  trigger:
+    type: compound
+    operator: or
+    triggers:
+      - type: posture_change
+        postures: ["origin-invalid", "path-suspect"]
+      - type: cache_unhealthy
+  cooldown: 30s
+  actions:
+    - type: webhook
+      url: "https://hooks.example.com/raven"
+```
+
+**Scoped Flowspec: auto-mitigate only within a critical range:**
+
+```yaml
+- name: "mitigate-critical-range"
+  trigger:
+    type: compound
+    operator: and
+    triggers:
+      - type: posture_change
+        postures: ["origin-invalid"]
+      - type: prefix
+        prefix: "198.51.100.0/24"
+  cooldown: 60s
+  actions:
+    - type: flowspec
+      gobgp_address: "localhost:50051"
+      dry_run: true
+      ttl: 30m
+      rule_action: drop
+```
 
 ### Recommended Rules
 
@@ -152,11 +260,10 @@ webhook failures.
 
 The webhook payload is compatible with:
 
-- **PagerDuty** — use the Events API v2 with a custom transformer
-- **Slack** — use an incoming webhook URL; transform the payload with a
-  small proxy function
-- **ServiceNow** — POST to the Table API endpoint for your incident table
-- **Alertmanager** — use a webhook receiver with a custom template
+- **PagerDuty**: use the Events API v2 with a custom transformer
+- **Slack**: use an incoming webhook URL; transform the payload with a small proxy function
+- **ServiceNow**: POST to the Table API endpoint for your incident table
+- **Alertmanager**: use a webhook receiver with a custom template
 
 ---
 
@@ -251,7 +358,7 @@ reject.
 
 !!! warning
     Max rules (`max_rules`) is a hard cap. When the registry is full, new
-    rules are dropped and logged. Set this conservatively — a runaway
+    rules are dropped and logged. Set this conservatively: a runaway
     event loop generating hundreds of Flowspec rules is worse than missing
     a few.
 
@@ -288,8 +395,8 @@ AS2121    1 route   origin-invalid   192.0.2.0/24
 AS65001   1 route   origin-invalid   10.10.0.0/24
 RECOMMENDATIONS
 
-2 origin-invalid routes — run raven what-if --reject-invalid
-ASPA coverage 0% — register ASPA objects at your RIR
+2 origin-invalid routes: run raven what-if --reject-invalid
+ASPA coverage 0%: register ASPA objects at your RIR
 Consider enabling reject-invalid after reviewing what-if output
 
 
@@ -310,7 +417,7 @@ Pipe audit output to your ticketing or reporting pipeline:
 
 On clean shutdown, RAVEN saves the route table and RPKI cache to a
 snapshot file. On restart, it restores from the snapshot before
-reconnecting to BMP and RTR — eliminating the 30–90 second blind
+reconnecting to BMP and RTR, eliminating the 30–90 second blind
 window of a cold start.
 
 Enable in config:
