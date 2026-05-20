@@ -44,15 +44,27 @@ still run.
 
 ### Trigger Types
 
-| Type | Description |
-|---|---|
-| `posture` | Route currently has one of the listed postures (steady-state) |
-| `posture_change` | Route posture transitions *to* one of the listed postures |
-| `prefix` | Route prefix falls within (or equals) the configured supernet |
-| `cache_unhealthy` | RTR cache becomes unreachable |
-| `compound` | AND/OR composition of any of the above trigger types |
+| Type | Required fields | Description |
+|---|---|---|
+| `posture` | `postures` | Route currently has one of the listed postures (steady-state) |
+| `posture_change` | `postures` | Route posture transitions *to* one of the listed postures |
+| `prefix` | `prefix` | Route prefix falls within (or equals) the configured supernet |
+| `asn` | `asns` | Route involves one of the listed ASNs |
+| `protected_asn` | `asns` | Origin-invalid route hijacks a prefix authorised for one of the listed ASNs |
+| `cache_unhealthy` | - | RTR cache becomes unreachable |
+| `compound` | - | AND/OR composition of any of the above trigger types |
 
 `posture` evaluates current state on every event; it fires even if the posture has not changed. `posture_change` fires only on transitions: when `old_posture != new_posture` and the new posture matches. Use `posture_change` for alerting (avoids re-firing on every update for a route that is already in a bad state); use `posture` inside compound triggers when you need to combine a steady-state check with another condition.
+
+**`asn` trigger** - fires whenever a route's origin ASN (default) or any ASN in
+its full AS path (`asn_match: path`) matches one in the `asns` list. Use this to
+track routing events involving a specific network.
+
+**`protected_asn` trigger** - fires when a route is `origin-invalid` and a
+covering VRP names one of the listed ASNs as the authorised originator. This
+detects prefix hijacks targeting prefixes you own: the hijacking route does not
+contain your ASN in its path, but the RPKI record says only your ASN is allowed
+to originate it.
 
 ### Compound Triggers
 
@@ -207,6 +219,52 @@ Fires on any `origin-invalid` event, *or* when a `path-suspect` event lands with
       max_rules: 50
 ```
 
+**Alert when any route involves a specific ASN (origin only):**
+
+```yaml
+- name: "track-as64496-origin"
+  trigger:
+    type: asn
+    asns: [64496]
+  cooldown: 300s
+  actions:
+    - type: log
+      level: info
+```
+
+**Alert when any route traverses a specific ASN (full path):**
+
+```yaml
+- name: "track-as64496-transit"
+  trigger:
+    type: asn
+    asns: [64496]
+    asn_match: path
+  cooldown: 300s
+  actions:
+    - type: webhook
+      url: "https://your-endpoint"
+```
+
+**Alert when your own prefixes are hijacked (protected_asn):**
+
+```yaml
+- name: "alert-my-prefix-hijacked"
+  trigger:
+    type: protected_asn
+    asns: [64511]
+  cooldown: 60s
+  actions:
+    - type: log
+      level: warn
+    - type: webhook
+      url: "https://your-pagerduty-or-slack-endpoint"
+```
+
+This rule fires only when an `origin-invalid` route covers a prefix for which
+a VRP names your ASN as the sole authorised originator — a strong signal that
+your prefix is being hijacked.
+
 ---
 
 ## Webhooks
@@ -220,9 +278,12 @@ The webhook action sends an HTTP POST to your endpoint when a rule fires.
   "id": "b65b80a6-1234-5678-abcd-ef0123456789",
   "timestamp": "2026-05-06T14:23:01Z",
   "type": "posture_change",
+  "rule_name": "alert-my-prefix-hijacked",
   "prefix": "192.0.2.0/24",
   "peer_addr": "10.0.0.1",
   "peer_asn": 65000,
+  "origin_asn": 64496,
+  "protected_asns": [64511],
   "old_posture": "",
   "new_posture": "origin-invalid",
   "rov_state": "Invalid",
@@ -230,6 +291,10 @@ The webhook action sends an HTTP POST to your endpoint when a rule fires.
   "router_id": "10.0.0.1"
 }
 ```
+
+`rule_name` identifies which rule fired the webhook. `protected_asns` lists the
+ASNs named as authorised originators in VRPs that cover the affected prefix — only
+present when covering VRPs exist.
 
 ### HMAC Signing
 
