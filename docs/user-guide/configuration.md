@@ -196,6 +196,27 @@ events:
           level: warn
         - type: webhook
           url: "https://hooks.example.com/raven"
+
+    - name: "alert-any-route-via-as64496"
+      trigger:
+        type: asn
+        asns: [64496]
+        asn_match: path       # "origin" (default) or "path"
+      cooldown: 60s
+      actions:
+        - type: log
+          level: info
+
+    - name: "alert-hijack-of-my-prefixes"
+      trigger:
+        type: protected_asn
+        asns: [64511]
+      cooldown: 60s
+      actions:
+        - type: log
+          level: warn
+        - type: webhook
+          url: "https://hooks.example.com/raven"
 ```
 
 **Trigger types:**
@@ -204,6 +225,8 @@ events:
 |---|---|
 | `posture_change` | Fires when a route's posture changes to one of the listed values |
 | `new_route` | Fires when a new route arrives with one of the listed postures |
+| `asn` | Fires when a route involves one of the listed ASNs (origin or full path) |
+| `protected_asn` | Fires when an origin-invalid route hijacks a prefix authorised for one of the listed ASNs |
 | `cache_unhealthy` | Fires when an RTR cache becomes unreachable |
 
 **Action types:**
@@ -224,9 +247,12 @@ same prefix+peer combination. Prevents alert storms during flapping.
   "id": "b65b80a6-...",
   "timestamp": "2026-05-06T14:23:01Z",
   "type": "posture_change",
+  "rule_name": "alert-origin-invalid",
   "prefix": "192.0.2.0/24",
   "peer_addr": "10.0.0.1",
   "peer_asn": 65000,
+  "origin_asn": 64496,
+  "protected_asns": [64511],
   "old_posture": "origin-only",
   "new_posture": "origin-invalid",
   "rov_state": "Invalid",
@@ -234,6 +260,10 @@ same prefix+peer combination. Prevents alert storms during flapping.
   "router_id": "10.0.0.1"
 }
 ```
+
+`rule_name` identifies which rule fired. `protected_asns` lists the ASNs named as
+authorized originators in matched VRPs — present only when there are covering VRPs
+(relevant for `protected_asn` trigger alerts).
 
 **Flowspec options:**
 
