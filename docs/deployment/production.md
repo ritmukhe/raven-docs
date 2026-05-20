@@ -36,7 +36,11 @@ and place it in `/usr/local/bin/`.
 
 ```bash
 sudo mkdir -p /etc/raven
-sudo cat > /etc/raven/raven.yaml << 'EOF'
+```
+
+Create `/etc/raven/raven.yaml`:
+
+```yaml
 bmp:
   listen: "0.0.0.0:11019"
 
@@ -64,3 +68,4 @@ api:
 logging:
   level: info
   format: json
+```
