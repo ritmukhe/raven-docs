@@ -129,6 +129,116 @@ rtr:
 RAVEN connects to both but treats preference 1 as authoritative. If it goes
 down, RAVEN automatically uses preference 2 and logs a warning.
 
+## Transport Security
+
+RAVEN supports TLS on both its outbound RTR connection
+(to your RPKI validator) and its inbound BMP listener
+(from your routers).
+
+### RTR over TLS
+
+To encrypt the RTR session between RAVEN and your RPKI
+validator, set `transport: tls` on the cache entry and
+optionally provide a CA certificate to verify the
+validator's identity:
+
+```yaml
+rtr:
+  caches:
+    - address: "rpki1.example.com:3324"
+      preference: 1
+      transport: tls
+      tls:
+        ca: "/etc/raven/rpki-ca.crt"   # verify validator cert
+        # cert: "/etc/raven/client.crt" # optional: mutual TLS
+        # key:  "/etc/raven/client.key"
+```
+
+If `ca` is omitted, RAVEN uses the system root CA pool.
+Mutual TLS (client certificate) is supported by adding
+`cert` and `key`.
+
+**Routinator TLS setup:**
+
+Routinator supports RTR-over-TLS natively. Start it
+with the `--rtr-tls` flag (note: separate from
+`--rtr-listen`):
+
+```bash
+routinator server \
+  --rtr-tls 127.0.0.1:3324 \
+  --rtr-tls-cert /path/to/server.crt \
+  --rtr-tls-key  /path/to/server.key
+```
+
+The IANA-assigned port for RTR-over-TLS is 324; use
+3324 to avoid requiring root privileges.
+
+**RTR version pinning:**
+
+If your validator does not support RTR v2, pin to v1
+to avoid reconnection loops during version negotiation:
+
+```yaml
+rtr:
+  rtr-version: "1"
+  caches:
+    - address: "rpki1.example.com:3324"
+      transport: tls
+      tls:
+        ca: "/etc/raven/rpki-ca.crt"
+```
+
+### BMP Listener TLS
+
+To require TLS on incoming BMP connections from your
+routers, add a `tls:` block under `bmp:`. A server
+certificate and key are required; a CA is optional and
+enables mutual TLS (verifying router client certs):
+
+```yaml
+bmp:
+  listen: ":11019"
+  tls:
+    cert: "/etc/raven/bmp.crt"   # required
+    key:  "/etc/raven/bmp.key"   # required
+    ca:   "/etc/raven/ca.crt"    # optional: mutual TLS
+```
+
+Without the `tls:` block, the BMP listener accepts
+plain TCP connections (default, compatible with all
+BMP-capable routers including FRR and SR Linux).
+
+> **Note:** Most routers do not currently support
+> BMP-over-TLS. This option is intended for deployments
+> where RAVEN is reachable across untrusted network
+> segments. For lab and internal deployments, plain TCP
+> is standard.
+
+### Generating Test Certificates
+
+For lab use, generate a self-signed CA and server cert
+with v3 extensions (required by modern TLS stacks):
+
+```bash
+# CA
+openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:P-256 \
+  -keyout ca.key -out ca.crt -days 365 -nodes \
+  -subj "/CN=raven-ca" \
+  -addext "basicConstraints=critical,CA:true" \
+  -addext "keyUsage=critical,keyCertSign,cRLSign"
+
+# Server cert (for Routinator or BMP listener)
+openssl req -newkey ec -pkeyopt ec_paramgen_curve:P-256 \
+  -keyout server.key -out server.csr -nodes \
+  -subj "/CN=localhost"
+
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key \
+  -CAcreateserial -out server.crt -days 365 \
+  -extfile <(printf "subjectAltName=DNS:localhost,IP:127.0.0.1\n\
+basicConstraints=CA:false\n")
+```
+
 ## Environment Variable Overrides
 
 Any config value can be overridden with an environment variable using the

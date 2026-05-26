@@ -15,6 +15,7 @@ security stack on your laptop. This is the same lab used for conference demos.
 
 The lab topology consists of four FRR routers and RAVEN connected via
 Containerlab:
+```
                 Internet (AS2121)
                        │ eBGP
                        ▼
@@ -28,6 +29,7 @@ Containerlab:
                        │
                        ▼
               Prometheus + Grafana
+```
 
 | Node | ASN | Role |
 |---|---|---|
