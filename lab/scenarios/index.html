@@ -1,0 +1,1798 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Ravens see what you can't. Documentation for RAVEN (bgp-routing-security-monitor) — BMP + RPKI ROV + ASPA path validation in a single binary.">
+      
+      
+      
+        <link rel="canonical" href="https://ritmukhe.github.io/raven-docs/lab/scenarios/">
+      
+      
+        <link rel="prev" href="../overview/">
+      
+      
+        <link rel="next" href="../../deployment/production/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Attack Scenarios - RAVEN</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#attack-scenarios" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="RAVEN" class="md-header__button md-logo" aria-label="RAVEN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            RAVEN
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Attack Scenarios
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="amber"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/nokia/bgp-routing-security-monitor" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nokia/bgp-routing-security-monitor
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/install/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../user-guide/configuration/" class="md-tabs__link">
+          
+  
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../overview/" class="md-tabs__link">
+          
+  
+  
+  Demo Lab
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../deployment/production/" class="md-tabs__link">
+          
+  
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../troubleshooting/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Troubleshooting
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="RAVEN" class="md-nav__button md-logo" aria-label="RAVEN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    RAVEN
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/nokia/bgp-routing-security-monitor" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nokia/bgp-routing-security-monitor
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quick-start/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/cli-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/security-postures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Postures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/observability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prometheus & Grafana
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/active-response/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Active Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo Lab
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Demo Lab
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attack Scenarios
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attack Scenarios
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#running-the-full-conference-demo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running the Full Conference Demo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Baseline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-1-origin-hijack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 1 — Origin Hijack
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-2-route-leak" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 2 — Route Leak
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-3-stealthy-hijack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 3 — Stealthy Hijack
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-4-rtr-cache-failure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 4 — RTR Cache Failure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-5-what-if-simulation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 5 — What-If Simulation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-6-aspa-recommender" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 6 — ASPA Recommender
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#full-demo-narrative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full Demo Narrative
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-3-scenarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3 Scenarios
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 3 Scenarios">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scenario-7-webhook-alert" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 7 — Webhook Alert
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenario-8-flowspec-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 8 — Flowspec Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenario-9-audit-report" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 9 — Audit Report
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenario-10-full-phase-3-sequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 10 — Full Phase 3 Sequence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/production/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/scaling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#running-the-full-conference-demo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running the Full Conference Demo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Baseline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-1-origin-hijack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 1 — Origin Hijack
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-2-route-leak" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 2 — Route Leak
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-3-stealthy-hijack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 3 — Stealthy Hijack
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-4-rtr-cache-failure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 4 — RTR Cache Failure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-5-what-if-simulation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 5 — What-If Simulation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-6-aspa-recommender" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 6 — ASPA Recommender
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#full-demo-narrative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full Demo Narrative
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-3-scenarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3 Scenarios
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 3 Scenarios">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scenario-7-webhook-alert" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 7 — Webhook Alert
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenario-8-flowspec-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 8 — Flowspec Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenario-9-audit-report" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 9 — Audit Report
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenario-10-full-phase-3-sequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 10 — Full Phase 3 Sequence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="attack-scenarios">Attack Scenarios</h1>
+<p>The demo lab includes scripted scenarios that demonstrate RAVEN's detection
+capabilities in real time. Run these after <code>demo-master.sh setup</code> completes.</p>
+<h2 id="running-the-full-conference-demo">Running the Full Conference Demo</h2>
+<p>To run all scenarios in sequence with narrated pauses:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>./demo-master.sh<span class="w"> </span>lacnic
+</code></pre></div>
+<p>This runs the complete 6-scenario LACNIC demo sequence: baseline, origin
+hijack, stealthy hijack, route leak, RTR cache failure, and audit report.</p>
+<h2 id="baseline">Baseline</h2>
+<p>Before running any scenario, verify the baseline is clean:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>baseline
+</code></pre></div>
+<p>Expected output:
+BASELINE CHECK
+origin-invalid routes: 0
+path-suspect routes:   0
+secured routes:        6
+origin-only routes:    4
+Baseline is clean. Ready for demo.</p>
+<p>Open Grafana at <a href="http://localhost:3000">http://localhost:3000</a> and keep it
+visible alongside your terminal. You will see the panels update in real time
+as each scenario runs.</p>
+<p>Also open a second terminal and run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>raven<span class="w"> </span>watch
+</code></pre></div>
+<p>This streams all validation state changes live.</p>
+<hr />
+<h2 id="scenario-1-origin-hijack">Scenario 1 — Origin Hijack</h2>
+<p>An attacker announces your prefix from an unauthorized ASN. ROV catches this
+because a ROA exists authorizing only the legitimate origin ASN.</p>
+<p><strong>Inject the hijack:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>hijack
+</code></pre></div>
+<p>What happens:</p>
+<ul>
+<li>The internet router (AS2121) announces <code>192.0.2.0/24</code> — a prefix it does
+  not own and has no ROA for</li>
+<li>RAVEN receives this via BMP from the upstream router</li>
+<li>ROV lookup finds a ROA authorizing a different ASN</li>
+<li>RAVEN marks the route <code>origin-invalid</code></li>
+</ul>
+<p><strong>What you will see in <code>raven watch</code>:</strong>
+[14:23:01] NEW  192.0.2.0/24  via 10.0.0.1  AS2121  ROV:Invalid  posture:origin-invalid
+Matched VRP: ROA{192.0.2.0/24, AS65000, maxLength=/24}
+Reason: Origin AS2121 not authorized — ROA authorizes AS65000</p>
+<p><strong>What you will see in Grafana:</strong></p>
+<ul>
+<li><code>origin-invalid</code> counter jumps from 0 to 1</li>
+<li>The origin-invalid routes table shows the hijacked prefix</li>
+</ul>
+<p><strong>CLI investigation:</strong></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>raven<span class="w"> </span>routes<span class="w"> </span>--posture<span class="w"> </span>origin-invalid
+</code></pre></div>
+PREFIX          PEER          ORIGIN  ROV      ASPA     POSTURE
+192.0.2.0/24    10.0.0.1   AS2121  Invalid  Unknown  origin-invalid</p>
+<p><strong>Clean up:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>hijack-clean
+</code></pre></div>
+<p>The route is withdrawn. <code>raven watch</code> shows the route disappearing.
+Grafana returns to baseline.</p>
+<hr />
+<h2 id="scenario-2-route-leak">Scenario 2 — Route Leak</h2>
+<p>A route leak occurs when an AS re-announces routes in the wrong direction.
+ROV cannot catch this — the origin ASN is legitimate. ASPA catches it because
+the AS_PATH contains a hop that violates published provider relationships.</p>
+<p><strong>Inject the route leak:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>leak
+</code></pre></div>
+<p>What happens:</p>
+<ul>
+<li>The upstream router (AS65000) leaks a route it received from the internet
+  back to the edge router via an unauthorized path</li>
+<li>The origin AS1199 (SURFnet) has a valid ROA — so ROV passes</li>
+<li>RAVEN walks the AS_PATH and finds a hop that violates an ASPA record</li>
+<li>RAVEN marks the route <code>path-suspect</code></li>
+</ul>
+<p><strong>What you will see in <code>raven watch</code>:</strong>
+[14:24:15] NEW  145.102.136.0/22  via 10.0.0.1  AS1199  ROV:Valid  ASPA:Invalid  posture:path-suspect
+AS_PATH: [65000 1199]
+Failing hop: AS1199→AS65000 — AS65000 not in AS1199 ASPA provider set (only AS1103)</p>
+<p><strong>What you will see in Grafana:</strong></p>
+<ul>
+<li><code>path-suspect</code> counter jumps from 0 to 1</li>
+<li>The path-suspect routes table shows the leaked route with the failing hop</li>
+</ul>
+<p><strong>CLI investigation:</strong></p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>raven<span class="w"> </span>routes<span class="w"> </span>--posture<span class="w"> </span>path-suspect
+</code></pre></div>
+PREFIX       PEER          ORIGIN  ROV    ASPA     POSTURE
+145.102.136.0/22   10.0.0.1   AS1199  Valid  Invalid  path-suspect</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>raven<span class="w"> </span>routes<span class="w"> </span>--posture<span class="w"> </span>path-suspect<span class="w"> </span>--format<span class="w"> </span>json
+</code></pre></div>
+<p>The JSON output includes the full <code>aspa</code> field with <code>failing_hop</code> details
+showing exactly which hop violated which ASPA record.</p>
+<p><strong>Clean up:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>leak-clean
+</code></pre></div>
+<hr />
+<h2 id="scenario-3-stealthy-hijack">Scenario 3 — Stealthy Hijack</h2>
+<p><strong>What it demonstrates:</strong> A more-specific prefix announcement that diverts
+traffic while the control plane appears clean. Detected only via data-plane
+probing.</p>
+<p><strong>Mechanism:</strong> The attacker (AS65099) announces <code>203.0.113.0/25</code> — a
+more-specific of the legitimate AS65000 /24. The edge router installs it via
+LPM. RAVEN's BMP RIB for the /24 still shows AS65000 as origin — the control
+plane looks clean. Only <code>raven check stealthy</code> reveals the divergence.</p>
+<p><strong>Run:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>./demo-master.sh<span class="w"> </span>stealthy
+</code></pre></div>
+<p><strong>What RAVEN shows:</strong>
+Control plane (BMP/RIB):
+  Route    : 203.0.113.0/24 via AS65000 (origin-only)
+  RIB state: CLEAN — ROV Valid, no path violations
+Data plane probe (traceroute from clab-raven-demo-edge):
+  Probe 1  : TTL-exceeded at 10.0.3.2 (AS65099 — ATTACKER)
+  Probe 2  : TTL-exceeded at 10.0.3.2 (AS65099 — ATTACKER)
+  Probe 3  : TTL-exceeded at 10.0.3.2 (AS65099 — ATTACKER)
+╔═════════════════════════════════════════════════════════╗
+║ STEALTHY HIJACK DETECTED: control/data-plane divergence ║
+║ RIB says: AS65000 │ Traffic goes to: AS65099            ║
+╚═════════════════════════════════════════════════════════╝</p>
+<p><strong>Why this matters:</strong> This is the attack class documented in NDSS 2026
+research and confirmed in the AS37100 incident (February 2025). BGP looking
+glasses, route collectors, and RPKI dashboards all show a clean network.
+Only data-plane probing correlated with BMP state reveals the compromise.</p>
+<p><strong>Clean up:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>./demo-master.sh<span class="w"> </span>stealthy-clean
+</code></pre></div>
+<hr />
+<h2 id="scenario-4-rtr-cache-failure">Scenario 4 — RTR Cache Failure</h2>
+<p><strong>What it demonstrates:</strong> RPKI validator unavailability and RAVEN's behavior
+during cache staleness.</p>
+<p><strong>Mechanism:</strong> Routinator is killed. RAVEN detects the RTR session failure,
+continues serving the last known RPKI state, and exposes staleness metrics
+via Prometheus. Routinator is then restored and the session reconnects
+automatically.</p>
+<p><strong>Run:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>./demo-master.sh<span class="w"> </span>rtr-fail
+</code></pre></div>
+<p><strong>What RAVEN shows:</strong></p>
+<p>After Routinator goes offline:
+raven_rtr_session_state{cache="localhost:3323"} 0
+raven_rtr_last_sync_seconds{cache="localhost:3323"} 1747600000
+raven_rtr_vrp_count{cache="localhost:3323"} 870026</p>
+<p>The route table continues to show correct validation results based on the
+last known VRP and ASPA state. No routes are incorrectly accepted during
+the outage.</p>
+<p><strong>Why this matters:</strong> Most routers default to fail-open on RTR expiry — they
+stop enforcing ROV when the cache expires. RAVEN gives you advance warning:
+monitor <code>raven_rtr_session_state</code> and alert when it hits 0.
+<code>raven_rtr_last_sync_seconds</code> tells you exactly when the last successful
+sync occurred.</p>
+<hr />
+<h2 id="scenario-5-what-if-simulation">Scenario 5 — What-If Simulation</h2>
+<p>This scenario does not inject any attack. It shows the operator impact of
+deploying routing security policies against the current route table.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>whatif
+</code></pre></div>
+<p>This runs two simulations:</p>
+<p><strong>reject-invalid simulation:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>raven<span class="w"> </span>what-if<span class="w"> </span>--reject-invalid
+</code></pre></div>
+<p>Shows how many routes would be dropped if you deployed reject-invalid policy
+today. In the lab this will be a small number since the lab prefixes all have
+ROAs. In production against a full DFZ table this is where the analysis becomes
+valuable.</p>
+<p><strong>ASPA enforcement simulation:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>raven<span class="w"> </span>what-if<span class="w"> </span>--aspa-enforce
+</code></pre></div>
+<p>Shows how many routes would be flagged as path-suspect under ASPA enforcement.
+Also shows the large number of routes that are currently unverifiable due to
+missing ASPA objects — which is the current state of the internet.</p>
+<hr />
+<h2 id="scenario-6-aspa-recommender">Scenario 6 — ASPA Recommender</h2>
+<p>Analyse observed AS_PATHs and generate ASPA object suggestions:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>recommend
+</code></pre></div>
+<p>This runs:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>raven<span class="w"> </span>aspa<span class="w"> </span>recommend<span class="w"> </span>--min-observations<span class="w"> </span><span class="m">1</span>
+</code></pre></div>
+<p>The recommender analyses every AS_PATH RAVEN has seen via BMP and infers
+customer-provider relationships. It then cross-references these against the
+ASPA store to identify which ASes could benefit from creating ASPA objects.</p>
+<p>In the lab the output will reflect the small set of routes in the topology.
+Against a production BMP feed with hundreds of thousands of routes, this
+becomes a powerful tool for identifying gaps in ASPA coverage.</p>
+<hr />
+<h2 id="full-demo-narrative">Full Demo Narrative</h2>
+<p>For conference presentations, run the scenarios in this order:</p>
+<ol>
+<li><code>setup</code> — deploy the lab, show <code>raven status</code> — everything green</li>
+<li><code>baseline</code> — show the clean route table in <code>raven routes</code></li>
+<li>Open Grafana and <code>raven watch</code> side by side</li>
+<li><code>hijack</code> — inject the hijack, show real-time detection</li>
+<li><code>hijack-clean</code> — clean up, show the route disappearing</li>
+<li><code>stealthy</code> — announce a more-specific from the attacker, show <code>raven check stealthy</code>
+   revealing the control/data-plane divergence</li>
+<li><code>stealthy-clean</code> — withdraw the more-specific</li>
+<li><code>leak</code> — inject the route leak, explain why ROV misses it but ASPA catches it</li>
+<li><code>leak-clean</code> — clean up</li>
+<li><code>rtr-fail</code> — kill Routinator, show staleness metrics and graceful behavior</li>
+<li><code>whatif</code> — show the policy impact simulation</li>
+<li><code>recommend</code> — show the ASPA recommender output</li>
+<li><code>down</code> — clean shutdown</li>
+</ol>
+<hr />
+<h2 id="phase-3-scenarios">Phase 3 Scenarios</h2>
+<p>These scenarios demonstrate RAVEN's active response capabilities — the Event
+Engine, webhooks, Flowspec lifecycle, and audit report.</p>
+<h3 id="scenario-7-webhook-alert">Scenario 7 — Webhook Alert</h3>
+<p>Shows the Event Engine firing a webhook when a hijack is detected.</p>
+<p><strong>Setup</strong> — start the webhook listener in a second terminal:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>webhook-listen
+</code></pre></div>
+<p><strong>Inject the hijack:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>hijack
+</code></pre></div>
+<p><strong>What you will see in the webhook listener terminal:</strong>
+─── Alert: 2026-05-06 14:23:01 ───
+{
+"type": "new_route",
+"prefix": "192.0.2.0/24",
+"new_posture": "origin-invalid",
+"rov_state": "Invalid",
+"router_id": "10.0.0.1"
+}</p>
+<p>The webhook fires within milliseconds of BMP arrival — before any human
+could have noticed the Grafana dashboard change.</p>
+<p><strong>Clean up:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>hijack-clean
+</code></pre></div>
+<hr />
+<h3 id="scenario-8-flowspec-lifecycle">Scenario 8 — Flowspec Lifecycle</h3>
+<p>Shows the full Flowspec mitigation lifecycle: automatic rule generation,
+dry-run review, live GoBGP injection, and withdrawal.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>flowspec
+</code></pre></div>
+<p>This runs interactively:</p>
+<ol>
+<li>Injects the origin hijack to trigger a Flowspec rule</li>
+<li>Shows the rule in <code>raven flowspec list</code> (dry-run mode)</li>
+<li>Prompts you to toggle to live injection</li>
+<li>Shows the rule in GoBGP after toggle</li>
+<li>Prompts you to withdraw</li>
+<li>Cleans up the hijack</li>
+</ol>
+<p><strong>Key commands demonstrated:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># Show active rules</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>raven<span class="w"> </span>flowspec<span class="w"> </span>list
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="c1"># Toggle a rule from dry-run to live GoBGP injection</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>raven<span class="w"> </span>flowspec<span class="w"> </span>toggle<span class="w"> </span><span class="s2">&quot;192.0.2.0/24|drop&quot;</span>
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="c1"># Verify the rule is active in GoBGP</span>
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>clab-raven-demo-gobgp<span class="w"> </span>gobgp<span class="w"> </span>global<span class="w"> </span>rib<span class="w"> </span>-a<span class="w"> </span>ipv4-flowspec
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>
+<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="c1"># Toggle back to dry-run (withdraw from GoBGP)</span>
+<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a>raven<span class="w"> </span>flowspec<span class="w"> </span>toggle<span class="w"> </span><span class="s2">&quot;192.0.2.0/24|drop&quot;</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code>flowspec</code> case requires the GoBGP sidecar container. Verify it is
+running with <code>docker ps | grep gobgp</code> before running this scenario.</p>
+</div>
+<hr />
+<h3 id="scenario-9-audit-report">Scenario 9 — Audit Report</h3>
+<p>Shows <code>raven audit</code> generating a full security posture report for a router.</p>
+<p><strong>Baseline audit:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>audit
+</code></pre></div>
+<p>This runs <code>raven audit --router 10.0.0.1</code> and shows:</p>
+<ul>
+<li>Total routes and per-posture breakdown</li>
+<li>ROV coverage percentage</li>
+<li>ASPA coverage percentage (0% in the lab — expected)</li>
+<li>Actionable recommendations</li>
+</ul>
+<p><strong>Audit after hijack</strong> — inject the hijack first, then audit:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>hijack
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>raven<span class="w"> </span>audit<span class="w"> </span>--router<span class="w"> </span><span class="m">10</span>.0.0.1
+</code></pre></div>
+<p>The audit now shows 2 origin-invalid routes and names the attacker ASN in
+the top offenders section.</p>
+<p><strong>Audit in different formats:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># JSON output — pipe to your SIEM or ticket system</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>raven<span class="w"> </span>audit<span class="w"> </span>--router<span class="w"> </span><span class="m">10</span>.0.0.1<span class="w"> </span>--format<span class="w"> </span>json
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="c1"># Markdown output — paste into incident post-mortems</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>raven<span class="w"> </span>audit<span class="w"> </span>--router<span class="w"> </span><span class="m">10</span>.0.0.1<span class="w"> </span>--format<span class="w"> </span>markdown
+</code></pre></div>
+<hr />
+<h3 id="scenario-10-full-phase-3-sequence">Scenario 10 — Full Phase 3 Sequence</h3>
+<p>Runs all Phase 3 scenarios automatically in sequence:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>bash<span class="w"> </span>lab/demo-master.sh<span class="w"> </span>phase3
+</code></pre></div>
+<p>This runs non-interactively:
+1. Origin hijack detection + webhook
+2. Flowspec rule generation + live toggle + GoBGP verification + withdraw
+3. Audit report before and after hijack
+4. Cleanup</p>
+<p>Use this for rehearsing the full Phase 3 demo flow.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/nokia/bgp-routing-security-monitor" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
