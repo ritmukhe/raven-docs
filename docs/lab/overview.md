@@ -9,14 +9,14 @@ security stack on your laptop. This is the same lab used for conference demos.
 - Live BGP sessions with BMP streaming to RAVEN
 - Routinator serving real RPKI data including ASPA objects
 - Prometheus and Grafana with pre-built dashboards
-- Scripted attack scenarios — origin hijack, route leak, what-if simulation
+- Scripted attack scenarios — IPv4/IPv6 origin hijack, route leak (ASPA), what-if simulation
 
 ## Topology
 
 The lab topology consists of four FRR routers and RAVEN connected via
 Containerlab:
 ```
-                Internet (AS2121)
+                Internet (AS64496)
                        │ eBGP
                        ▼
         Upstream (AS65000) ─── eBGP ─── Attacker (AS65099)
@@ -33,14 +33,18 @@ Containerlab:
 
 | Node | ASN | Role |
 |---|---|---|
-| internet | AS2121 | Originates `193.0.0.0/21` (RIPE NCC prefix, real ASPA record) |
+| internet | AS64496 | Originates `2001:db8:2121::/48` (IPv6 demo prefix); used as the IPv4 origin-hijack source for `192.0.2.0/24` |
 | upstream | AS65000 | Transit provider, sends post-policy BMP to RAVEN |
 | edge | AS65001 | Edge router, sends pre-policy BMP to RAVEN |
-| attacker | AS65099 | Peered with upstream and edge, announces nothing at rest |
+| attacker | AS65099 | Peered with upstream and edge; used for stealthy hijack and IPv6 origin hijack |
 
-The attacker node is used for origin hijack (Scenario 2), stealthy hijack
-(Scenario 3), and the route leak uses the internet router's real ASPA record
-(AS2121, providers: AS3333 only) to produce a genuine ASPA:Invalid result.
+AS64496 is from RFC 5398's documentation/private range — chosen so the lab
+never collides with real-world RPKI records. The route-leak scenario uses
+real-world RPKI data: upstream (AS65000) re-originates `145.102.136.0/22`
+(owned by AS1199 / SURFnet, with a real ROA) and prepends AS1199 in the
+AS_PATH. AS1199's published ASPA lists AS1103 as its only authorized
+provider, so the hop AS1199→AS65000 fires ASPA:Invalid and the route
+lands in `path-suspect`.
 
 ## Prerequisites
 
@@ -136,15 +140,17 @@ Grafana: http://localhost:3000  (admin/admin)
 ## Demo Commands Reference
 
 ```bash
-bash lab/demo-master.sh setup        # Start everything
-bash lab/demo-master.sh down         # Stop everything cleanly
-bash lab/demo-master.sh baseline     # Show clean route table
-bash lab/demo-master.sh hijack       # Inject origin hijack
-bash lab/demo-master.sh hijack-clean # Withdraw the hijack
-bash lab/demo-master.sh leak         # Inject route leak
-bash lab/demo-master.sh leak-clean   # Withdraw the leak
-bash lab/demo-master.sh whatif       # Run what-if simulator
-bash lab/demo-master.sh recommend    # Run ASPA recommender
+bash lab/demo-master.sh setup         # Start everything
+bash lab/demo-master.sh down          # Stop everything cleanly
+bash lab/demo-master.sh baseline      # Show clean route table
+bash lab/demo-master.sh hijack        # Inject IPv4 origin hijack
+bash lab/demo-master.sh hijack-clean  # Withdraw the IPv4 hijack
+bash lab/demo-master.sh hijack6       # Inject IPv6 origin hijack
+bash lab/demo-master.sh unhijack6     # Withdraw the IPv6 hijack
+bash lab/demo-master.sh leak          # Inject route leak (ASPA)
+bash lab/demo-master.sh leak-clean    # Withdraw the route leak
+bash lab/demo-master.sh whatif        # Run what-if simulator
+bash lab/demo-master.sh recommend     # Run ASPA recommender
 ```
 
 ## Grafana Dashboard

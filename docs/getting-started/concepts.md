@@ -89,6 +89,20 @@ relationship. ASPA catches this.
 | **Unknown** | Some ASes in the path have no ASPA records — cannot verify |
 | **Unverifiable** | AS_PATH contains AS_SETs or other constructs that prevent verification |
 
+## IPv6 Support
+
+RAVEN monitors IPv6 routes alongside IPv4. BMP messages carrying IPv6
+prefixes use the BGP multiprotocol path attributes `MP_REACH_NLRI` and
+`MP_UNREACH_NLRI` (RFC 4760), which RAVEN parses natively for both
+announcements and withdrawals. Validation runs the same code path as for
+IPv4 — ROV looks up each IPv6 route against the IPv6 VRP store, and ASPA
+walks the AS_PATH regardless of the address family.
+
+The CLI exposes IPv6 routes through the same commands as IPv4
+(`raven routes --afi v6` to filter, `raven routes --prefix 2001:db8::/32`
+to query by IPv6 prefix), and Prometheus metrics carry an `afi="ipv6"`
+label so IPv4 and IPv6 postures can be charted side by side in Grafana.
+
 ## RTR — Router to Relying Party Protocol
 
 RTR (RFC 8210, and RTR v2 in draft-ietf-sidrops-8210bis) is the protocol

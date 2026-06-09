@@ -456,7 +456,7 @@ origin-only      3   (50%)
 unverified       1   (17%)
 origin-invalid   2   (33%)
 TOP OFFENDERS
-AS2121    1 route   origin-invalid   192.0.2.0/24
+AS64496   1 route   origin-invalid   192.0.2.0/24
 AS65001   1 route   origin-invalid   10.10.0.0/24
 RECOMMENDATIONS
 

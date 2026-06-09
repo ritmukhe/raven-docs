@@ -43,6 +43,7 @@ nav:
     - Production Setup: deployment/production.md
     - Scaling: deployment/scaling.md
   - Troubleshooting: troubleshooting.md
+  - Changelog: CHANGELOG.md
 
 markdown_extensions:
   - admonition

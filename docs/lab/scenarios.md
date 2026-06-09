@@ -44,10 +44,11 @@ This streams all validation state changes live.
 
 ---
 
-## Scenario 1 — Origin Hijack
+## Scenario 1 — IPv4 Origin Hijack
 
-An attacker announces your prefix from an unauthorized ASN. ROV catches this
-because a ROA exists authorizing only the legitimate origin ASN.
+A router announces a prefix it does not own from an unauthorized ASN. ROV
+catches this because the prefix has a ROA authorizing only the legitimate
+origin ASN.
 
 **Inject the hijack:**
 
@@ -57,16 +58,16 @@ bash lab/demo-master.sh hijack
 
 What happens:
 
-- The internet router (AS2121) announces `192.0.2.0/24` — a prefix it does
-  not own and has no ROA for
+- The internet router (AS64496) announces `192.0.2.0/24` — a prefix it
+  does not own and has no ROA for
 - RAVEN receives this via BMP from the upstream router
 - ROV lookup finds a ROA authorizing a different ASN
 - RAVEN marks the route `origin-invalid`
 
 **What you will see in `raven watch`:**
-[14:23:01] NEW  192.0.2.0/24  via 10.0.0.1  AS2121  ROV:Invalid  posture:origin-invalid
+[14:23:01] NEW  192.0.2.0/24  via 10.0.0.1  AS64496  ROV:Invalid  posture:origin-invalid
 Matched VRP: ROA{192.0.2.0/24, AS65000, maxLength=/24}
-Reason: Origin AS2121 not authorized — ROA authorizes AS65000
+Reason: Origin AS64496 not authorized — ROA authorizes AS65000
 
 **What you will see in Grafana:**
 
@@ -78,8 +79,8 @@ Reason: Origin AS2121 not authorized — ROA authorizes AS65000
 ```bash
 raven routes --posture origin-invalid
 ```
-PREFIX          PEER          ORIGIN  ROV      ASPA     POSTURE
-192.0.2.0/24    10.0.0.1   AS2121  Invalid  Unknown  origin-invalid
+PREFIX          PEER          ORIGIN   ROV      ASPA     POSTURE
+192.0.2.0/24    10.0.0.1   AS64496  Invalid  Unknown  origin-invalid
 
 **Clean up:**
 
@@ -92,7 +93,7 @@ Grafana returns to baseline.
 
 ---
 
-## Scenario 2 — Route Leak
+## Scenario 2 — Route Leak (ASPA)
 
 A route leak occurs when an AS re-announces routes in the wrong direction.
 ROV cannot catch this — the origin ASN is legitimate. ASPA catches it because
@@ -145,7 +146,49 @@ bash lab/demo-master.sh leak-clean
 
 ---
 
-## Scenario 3 — Stealthy Hijack
+## Scenario 3 — IPv6 Origin Hijack
+
+The same class of attack as Scenario 1, but in the IPv6 control plane. The
+attacker node (AS65099) announces an IPv6 prefix that has a ROA pointing to
+a different ASN. RAVEN parses BMP MP_REACH_NLRI for IPv6, performs ROV
+against the IPv6 VRP store, and marks the route `origin-invalid`.
+
+**Inject the hijack:**
+
+```bash
+bash lab/demo-master.sh hijack6
+```
+
+What happens:
+
+- The attacker router (AS65099) announces `2001:db8:2121::/48` — a prefix
+  whose ROA authorizes AS64496 (the lab's internet router)
+- RAVEN receives the IPv6 NLRI via BMP MP_REACH_NLRI from upstream and edge
+- ROV finds a covering ROA but the origin ASN does not match
+- RAVEN marks the route `origin-invalid`
+
+**What you will see in `raven watch`:**
+[14:25:30] NEW  2001:db8:2121::/48  via 2001:db8:10:2::1  AS65099  ROV:Invalid  posture:origin-invalid
+Matched VRP: ROA{2001:db8:2121::/48, AS64496, maxLength=/48}
+Reason: Origin AS65099 not authorized — ROA authorizes AS64496
+
+**CLI investigation:**
+
+```bash
+raven routes --posture origin-invalid --afi v6
+```
+PREFIX               PEER                 ORIGIN   ROV      ASPA     POSTURE
+2001:db8:2121::/48   2001:db8:10:2::1  AS65099  Invalid  Unknown  origin-invalid
+
+**Clean up:**
+
+```bash
+bash lab/demo-master.sh unhijack6
+```
+
+---
+
+## Scenario 4 — Stealthy Hijack
 
 **What it demonstrates:** A more-specific prefix announcement that diverts
 traffic while the control plane appears clean. Detected only via data-plane
@@ -188,7 +231,7 @@ Only data-plane probing correlated with BMP state reveals the compromise.
 
 ---
 
-## Scenario 4 — RTR Cache Failure
+## Scenario 5 — RTR Cache Failure
 
 **What it demonstrates:** RPKI validator unavailability and RAVEN's behavior
 during cache staleness.
@@ -223,7 +266,7 @@ sync occurred.
 
 ---
 
-## Scenario 5 — What-If Simulation
+## Scenario 6 — What-If Simulation
 
 This scenario does not inject any attack. It shows the operator impact of
 deploying routing security policies against the current route table.
@@ -257,7 +300,7 @@ missing ASPA objects — which is the current state of the internet.
 
 ---
 
-## Scenario 6 — ASPA Recommender
+## Scenario 7 — ASPA Recommender
 
 Analyse observed AS_PATHs and generate ASPA object suggestions:
 
@@ -288,17 +331,19 @@ For conference presentations, run the scenarios in this order:
 1. `setup` — deploy the lab, show `raven status` — everything green
 2. `baseline` — show the clean route table in `raven routes`
 3. Open Grafana and `raven watch` side by side
-4. `hijack` — inject the hijack, show real-time detection
+4. `hijack` — inject the IPv4 hijack, show real-time detection
 5. `hijack-clean` — clean up, show the route disappearing
-6. `stealthy` — announce a more-specific from the attacker, show `raven check stealthy`
+6. `hijack6` — inject the IPv6 hijack, show ROV firing on the IPv6 NLRI
+7. `unhijack6` — withdraw the IPv6 hijack
+8. `stealthy` — announce a more-specific from the attacker, show `raven check stealthy`
    revealing the control/data-plane divergence
-7. `stealthy-clean` — withdraw the more-specific
-8. `leak` — inject the route leak, explain why ROV misses it but ASPA catches it
-9. `leak-clean` — clean up
-10. `rtr-fail` — kill Routinator, show staleness metrics and graceful behavior
-11. `whatif` — show the policy impact simulation
-12. `recommend` — show the ASPA recommender output
-13. `down` — clean shutdown
+9. `stealthy-clean` — withdraw the more-specific
+10. `leak` — inject the route leak, explain why ROV misses it but ASPA catches it
+11. `leak-clean` — clean up
+12. `rtr-fail` — kill Routinator, show staleness metrics and graceful behavior
+13. `whatif` — show the policy impact simulation
+14. `recommend` — show the ASPA recommender output
+15. `down` — clean shutdown
 
 ---
 
@@ -307,7 +352,7 @@ For conference presentations, run the scenarios in this order:
 These scenarios demonstrate RAVEN's active response capabilities — the Event
 Engine, webhooks, Flowspec lifecycle, and audit report.
 
-### Scenario 7 — Webhook Alert
+### Scenario 8 — Webhook Alert
 
 Shows the Event Engine firing a webhook when a hijack is detected.
 
@@ -344,7 +389,7 @@ bash lab/demo-master.sh hijack-clean
 
 ---
 
-### Scenario 8 — Flowspec Lifecycle
+### Scenario 9 — Flowspec Lifecycle
 
 Shows the full Flowspec mitigation lifecycle: automatic rule generation,
 dry-run review, live GoBGP injection, and withdrawal.
@@ -384,7 +429,7 @@ raven flowspec toggle "192.0.2.0/24|drop"
 
 ---
 
-### Scenario 9 — Audit Report
+### Scenario 10 — Audit Report
 
 Shows `raven audit` generating a full security posture report for a router.
 
@@ -423,7 +468,7 @@ raven audit --router 10.0.0.1 --format markdown
 
 ---
 
-### Scenario 10 — Full Phase 3 Sequence
+### Scenario 11 — Full Phase 3 Sequence
 
 Runs all Phase 3 scenarios automatically in sequence:
 

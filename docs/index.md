@@ -31,6 +31,7 @@ raven routes --posture origin-invalid
 | Capability | Description |
 |---|---|
 | **BMP Ingest** | Accept BMP sessions from any vendor's router |
+| **IPv6** | IPv6 route monitoring via BMP `MP_REACH_NLRI` / `MP_UNREACH_NLRI`, with ROV validation against IPv6 ROAs |
 | **ROV** | Route Origin Validation per RFC 6811 |
 | **ASPA** | AS_PATH validation per draft-ietf-sidrops-aspa-verification-24 |
 | **Combined Posture** | Unified security posture per route (Secured / Path-Suspect / Origin-Invalid / ...) |
