@@ -35,6 +35,7 @@ rtr:
       transport: tls
       tls:
         ca: "/etc/raven/rpki-ca.pem"
+        tls-min-version: "1.2"      # 1.2 (default) | 1.3
   rtr-version: auto                 # auto | 1 | 2 (default: auto)
   expire-interval: 7200             # Override cache expire in seconds
 
@@ -48,14 +49,22 @@ outputs:
   prometheus:
     listen: ":9595"                 # Prometheus metrics endpoint
     path: "/metrics"
-
-api:
-  listen: "localhost:11020"         # REST/gRPC API (default: localhost:11020)
+  otel:                             # optional OTLP export (see below)
+    enabled: false
+  # kafka:                          # optional event sink
+  #   brokers: ["localhost:9092"]
+  #   topic: "raven-events"
+  # file:                           # optional event sink
+  #   path: "/var/log/raven/events.ndjson"
 
 logging:
   level: info                       # debug | info | warn | error
   format: text                      # text | json
 ```
+
+!!! note
+    There is no `api:` section. The API server always binds to `:11020`
+    (not configurable). See [API Section](#api-section) below.
 
 ## Configuration Options Explained
 
@@ -104,14 +113,29 @@ procedure for each route:
 ### Outputs Section
 
 **`outputs.prometheus`** — Exposes a Prometheus `/metrics` endpoint. Point your
-Prometheus scraper at this address. See [Prometheus & Grafana](observability.md)
+Prometheus scraper at this address. See [Observability & Metrics](observability.md)
 for the full metrics reference.
+
+**`outputs.otel`** — Optional OTLP metrics export alongside Prometheus. See
+[OpenTelemetry Configuration](#opentelemetry-configuration) below.
+
+**`outputs.kafka`** — Optional event sink that publishes events to a Kafka
+topic (`brokers`, `topic`).
+
+**`outputs.file`** — Optional event sink that appends events to a file
+(`path`, `rotation`).
 
 ### API Section
 
-**`api.listen`** — The address the REST/gRPC API listens on. The CLI commands
-connect to this address. Default is `localhost:11020` — change this if you want
-to query RAVEN from another machine.
+The API server is **not configurable**. It always binds to `:11020`
+(hardcoded — see `internal/server/server.go:39` and `:339`). There is no
+`api:` section in `raven.yaml`; adding one has no effect.
+
+The CLI's `--address` flag (default `localhost:11020`) is a **client-side**
+setting: it tells the CLI where to reach a running RAVEN, but does not
+configure the server's bind address. To query a remote instance, pass
+`--address <host>:11020` on each command (see [Pointing the CLI at a Remote
+RAVEN Instance](#pointing-the-cli-at-a-remote-raven-instance) below).
 
 ## Multiple RTR Caches
 
@@ -152,11 +176,15 @@ rtr:
         ca: "/etc/raven/rpki-ca.crt"   # verify validator cert
         # cert: "/etc/raven/client.crt" # optional: mutual TLS
         # key:  "/etc/raven/client.key"
+        # tls-min-version: "1.2"        # 1.2 (default) | 1.3
 ```
 
 If `ca` is omitted, RAVEN uses the system root CA pool.
 Mutual TLS (client certificate) is supported by adding
-`cert` and `key`.
+`cert` and `key`. `tls-min-version` pins the minimum
+negotiated TLS version — `"1.2"` (default) or `"1.3"` —
+and is available on both the RTR `tls:` block above and
+the BMP `tls:` block below.
 
 **Routinator TLS setup:**
 
@@ -203,6 +231,7 @@ bmp:
     cert: "/etc/raven/bmp.crt"   # required
     key:  "/etc/raven/bmp.key"   # required
     ca:   "/etc/raven/ca.crt"    # optional: mutual TLS
+    # tls-min-version: "1.2"     # 1.2 (default) | 1.3
 ```
 
 Without the `tls:` block, the BMP listener accepts
@@ -251,18 +280,18 @@ RAVEN_LOGGING_LEVEL=debug raven serve
 
 ## Pointing the CLI at a Remote RAVEN Instance
 
-By default the CLI connects to `localhost:11020`. To query a remote instance:
+By default the CLI connects to `localhost:11020`. To query a remote instance,
+pass `--address` on each command:
 
 ```bash
 raven routes --address 192.0.2.10:11020 --posture origin-invalid
 ```
 
-Or set it permanently:
+`--address` is a per-invocation flag — it is not read from `raven.yaml` or from
+an environment variable. To avoid repeating it, wrap it in a shell alias:
 
-```yaml
-# raven.yaml (client side)
-api:
-  listen: "192.0.2.10:11020"
+```bash
+alias raven-prod='raven --address 192.0.2.10:11020'
 ```
 
 ---
@@ -333,11 +362,13 @@ events:
 
 | Type | Description |
 |---|---|
-| `posture_change` | Fires when a route's posture changes to one of the listed values |
-| `new_route` | Fires when a new route arrives with one of the listed postures |
-| `asn` | Fires when a route involves one of the listed ASNs (origin or full path) |
+| `posture` | Fires whenever a route currently has one of the listed postures |
+| `posture_change` | Fires when a route's posture *changes* to one of the listed values |
+| `prefix` | Fires on routes matching a specific prefix |
+| `asn` | Fires when a route involves one of the listed ASNs. `asn_match: origin` (default) matches the origin only; `asn_match: path` matches any ASN in the full path |
 | `protected_asn` | Fires when an origin-invalid route hijacks a prefix authorised for one of the listed ASNs |
 | `cache_unhealthy` | Fires when an RTR cache becomes unreachable |
+| `compound` | Combines sub-`triggers` with an `operator` of `and` or `or` |
 
 **Action types:**
 
@@ -394,16 +425,16 @@ authorized originators in matched VRPs — present only when there are covering 
 
 ---
 
-## Snapshot Configuration
+## Persistence (Warm-Start Snapshots)
 
-The `snapshot` section configures warm-start persistence — saving the route
+The `persistence` section configures warm-start snapshots — saving the route
 table and RPKI cache to disk so RAVEN can restore state quickly on restart.
 
 ```yaml
-snapshot:
+persistence:
   enabled: true
-  path: "/var/lib/raven/snapshot.json"
-  stale_timeout: 5m        # How long restored routes are marked stale
+  snapshot_dir: "/var/lib/raven/snapshots"   # directory, not a file
+  stale_eviction_timeout: 5m                 # evict unconfirmed restored routes after this
 ```
 
 **Options:**
@@ -411,26 +442,32 @@ snapshot:
 | Option | Default | Description |
 |---|---|---|
 | `enabled` | `false` | Enable snapshot save/restore |
-| `path` | `raven-snapshot.json` | File path for the snapshot |
-| `stale_timeout` | `5m` | Routes restored from snapshot are marked stale and evicted after this duration if not refreshed via BMP |
+| `snapshot_dir` | `~/.raven/snapshots` | Directory for snapshot files (supports `~` expansion) |
+| `stale_eviction_timeout` | `5m` | Routes restored from a snapshot but never confirmed by a live BMP message are evicted this long after startup |
 
-Without snapshots, RAVEN rebuilds its route table from BMP table dumps on
-restart (typically 30–90 seconds). With snapshots, the route table is
-available immediately on startup while BMP reconnects in the background.
+Without persistence, RAVEN rebuilds its route table from BMP table dumps on
+restart (typically 30–90 seconds). With it, the route table is available
+immediately on startup while BMP reconnects in the background.
 
 ---
 
 ## OpenTelemetry Configuration
 
-The `otel` section configures OTLP metrics export alongside Prometheus.
+The `outputs.otel` section configures OTLP metrics export alongside Prometheus.
 
 ```yaml
-otel:
-  enabled: true
-  endpoint: "http://otel-collector:4318"
-  protocol: http               # http | grpc
-  interval: 30s
-  service_name: "raven"
+outputs:
+  otel:
+    enabled: true
+    endpoint: "otel-collector:4317"
+    protocol: grpc               # grpc | http
+    interval: 30s
+    insecure: true              # true = no TLS on the OTLP connection
+    headers:                    # optional per-request headers (e.g. auth)
+      x-api-key: "secret"
+    resource_attributes:        # attached to every exported metric
+      service.name: "raven"
+      service.version: "v0.1.0"
 ```
 
 **Options:**
@@ -438,10 +475,12 @@ otel:
 | Option | Default | Description |
 |---|---|---|
 | `enabled` | `false` | Enable OpenTelemetry export |
-| `endpoint` | `http://localhost:4318` | OTLP collector endpoint |
-| `protocol` | `http` | Export protocol: `http` or `grpc` |
+| `endpoint` | `localhost:4317` | OTLP collector endpoint |
+| `protocol` | `grpc` | Export protocol: `grpc` or `http` |
 | `interval` | `30s` | Metrics export interval |
-| `service_name` | `raven` | Service name in OTLP resource attributes |
+| `insecure` | `true` | Disable TLS on the OTLP connection |
+| `headers` | — | Optional map of headers sent with each OTLP request |
+| `resource_attributes` | `service.name=raven`, `service.version=v0.1.0` | Resource attributes attached to exported metrics. Set the service name here — there is no separate `service_name` option |
 
 RAVEN exports the same metrics via OTLP as via Prometheus. Both outputs
 can be active simultaneously. RAVEN continues normally if the OTLP

@@ -5,11 +5,19 @@ API (default: `localhost:11020`). Use `--address` to target a remote instance.
 
 ## Global Flags
 
+These persistent flags are accepted by every command:
+
 | Flag | Default | Description |
 |---|---|---|
-| `--address` | `localhost:11020` | RAVEN daemon address |
-| `--config` | `raven.yaml` | Config file path (serve command only) |
-| `--format` | `table` | Output format: `table` or `json` |
+| `--address` | `localhost:11020` | RAVEN daemon address for CLI queries |
+| `--config` | `./raven.yaml` | Config file path (search order: `./raven.yaml`, then `/etc/raven/raven.yaml`). Only `serve` reads the daemon config |
+| `--log-level` | `info` | Log level: `debug`, `info`, `warn`, `error` |
+| `--log-format` | `json` | Log format: `json` or `text` |
+
+!!! note
+    `--format` is **not** a global flag — it is a per-command flag (`table` or
+    `json`, and `markdown` on `raven audit`). Each command's flag table below
+    lists whether it accepts `--format`.
 
 ---
 
@@ -496,3 +504,127 @@ Dry-run: LIVE → yes (withdrawn from GoBGP)
     it to any configured BGP peers. Only toggle to live when you intend
     to apply the mitigation. The rule will auto-expire after the
     configured TTL (default: 5 minutes).
+
+---
+
+## raven rtr
+
+Parent command group for RTR (RPKI-to-Router) cache session tools. It has no
+action of its own — run it bare to list the subcommands.
+
+```bash
+raven rtr
+```
+
+**Subcommands:**
+
+| Command | Description |
+|---|---|
+| `raven rtr monitor` | Observe an RTR cache session, log telemetry to NDJSON, and detect anomalies |
+| `raven rtr seed-baseline` | Build an anomaly-detector baseline snapshot from recorded telemetry |
+
+These commands are **standalone** — they connect directly to an RTR cache and
+do not require a running `raven serve` daemon or a config file.
+
+---
+
+## raven rtr monitor
+
+Connect to a single RTR cache, record session lifecycle and sync events as
+NDJSON, and run the adaptive anomaly detector over the sync stream. It keeps
+in-memory VRP/ASPA stores only to drive the RTR client — no BMP ingestion or
+route validation happens here. Every setting comes from flags; no config file
+is read.
+
+```bash
+raven rtr monitor --cache localhost:3323 --log-file rtr-telemetry.ndjson
+raven rtr monitor --cache rpki.example.com:3323 --transport tls
+raven rtr monitor --log-file /tmp/rtr.ndjson --prometheus :9595
+raven rtr monitor --anomaly-snapshot ~/.raven/anomaly-baseline.json --prometheus :9595
+```
+
+Runs in the foreground until you press Ctrl+C.
+
+**Flags:**
+
+| Flag | Default | Description |
+|---|---|---|
+| `--cache` | `localhost:3323` | RTR cache address |
+| `--log-file` | `rtr-telemetry.ndjson` | Path to the NDJSON telemetry output file (created if absent, appended if present) |
+| `--transport` | `tcp` | RTR transport: `tcp` or `tls` |
+| `--prometheus` | — | Prometheus listen address (e.g. `:9595`); empty disables the metrics endpoint |
+| `--anomaly-snapshot` | `~/.raven/anomaly-baseline.json` | Path to the adaptive anomaly-detector baseline snapshot (JSON) |
+
+**Anomaly detection:**
+
+- The detector **warm-starts** from the baseline snapshot at `--anomaly-snapshot`
+  if one exists. A missing or unreadable snapshot degrades to a cold start —
+  it never blocks startup. Seed a snapshot ahead of time with
+  `raven rtr seed-baseline` to skip the live warm-up.
+- Each incremental sync is scored against rolling per-metric windows
+  (`interval_since_ns`, `sync_duration_ns`, `vrp_announced`, `vrp_withdrawn`,
+  `aspa_announced`, `aspa_withdrawn`) using median/MAD adaptive thresholds.
+- **Full resyncs are recorded but not evaluated** — a full table dump reports
+  nearly the entire VRP/ASPA set as "announced", which is not comparable to
+  incremental deltas and would trip a false positive.
+- When an anomaly fires it is written to the NDJSON sink as an `anomaly` record
+  and, if `--prometheus` is set, increments `raven_rtr_anomaly_total{cache,severity}`
+  and sets `raven_rtr_anomaly_last_timestamp{cache}`. See
+  [Observability & Metrics](observability.md) for the metric reference.
+- The baseline is saved periodically and again on graceful shutdown, so a
+  restarted monitor resumes from where it left off.
+
+**Watching for anomalies live:**
+
+```bash
+tail -f rtr-telemetry.ndjson | grep '"event_type":"anomaly"'
+```
+
+---
+
+## raven rtr seed-baseline
+
+Replay a recorded NDJSON telemetry file through the anomaly detector's rolling
+windows and write the resulting baseline snapshot. Run it once against an
+existing collection to produce a reusable baseline that
+`raven rtr monitor --anomaly-snapshot` loads on startup, skipping the live
+warm-up period.
+
+```bash
+raven rtr seed-baseline --input rtr-baseline.ndjson
+raven rtr seed-baseline --input rtr-baseline.ndjson --output ~/.raven/anomaly-baseline.json
+```
+
+Only **sync** records populate the windows; connected/disconnected and
+structural (reset/error) records are ignored, and full syncs are skipped. The
+input is treated as ground-truth-normal, so no anomalies are reported during
+seeding.
+
+**Flags:**
+
+| Flag | Default | Description |
+|---|---|---|
+| `--input` | required | Path to the recorded NDJSON telemetry file to seed from |
+| `--output` | `~/.raven/anomaly-baseline.json` | Path to write the baseline snapshot to |
+
+**Example output:**
+lines processed: 40320
+sync records:    1342 (7 full syncs skipped)
+window fill levels for localhost:3323:
+  interval_since_ns: 500/500 (full)
+  sync_duration_ns:  500/500 (full)
+  vrp_announced:     500/500 (full)
+  vrp_withdrawn:     500/500 (full)
+  aspa_announced:    500/500 (full)
+  aspa_withdrawn:    500/500 (full)
+output: /home/user/.raven/anomaly-baseline.json
+
+A window that reaches its cap (500 samples) reports `(full)` — the detector has
+a complete baseline for that metric. Partially-filled windows still work but
+give the detector less history to reason about.
+
+!!! tip
+    The typical workflow is: record telemetry with `raven rtr monitor` over a
+    representative period, run `raven rtr seed-baseline` against that file once,
+    then start the live monitor with `--anomaly-snapshot` pointed at the seeded
+    baseline so it detects from the first sync.

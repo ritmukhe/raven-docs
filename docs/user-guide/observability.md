@@ -1,4 +1,4 @@
-# Prometheus & Grafana
+# Observability & Metrics
 
 RAVEN exposes a Prometheus metrics endpoint and ships with pre-built Grafana
 dashboards that give you a real-time view of your routing security posture.
@@ -56,14 +56,13 @@ raven_routes_total{posture="origin-invalid", afi="ipv4"}
 
 Same metrics available with `afi="ipv6"`.
 
-**Per-peer route counts:**
-raven_peer_routes{peer="192.168.1.1", peer_asn="65001", posture="secured"}
-raven_peer_routes{peer="192.168.1.1", peer_asn="65001", posture="origin-invalid"}
+**Total route table size:**
+raven_route_table_size                           # Total pre-policy routes in the table
 
 **BMP session health:**
-raven_bmp_session_state{router="192.168.1.1"}    # 1=up, 0=down
-raven_bmp_messages_total{router="192.168.1.1", type="route_monitoring"}
-raven_bmp_peer_routes{router="192.168.1.1"}
+raven_bmp_session_state{router="192.168.1.1"}                     # 1=up, 0=down
+raven_bmp_messages_total{router="192.168.1.1", msg_type="route_monitoring"}
+raven_bmp_peer_state{router="192.168.1.1", peer="192.0.2.1"}      # 1=established, 0=down
 
 **RTR cache health:**
 raven_rtr_session_state{cache="localhost:3323"}      # 1=up, 0=down
@@ -72,7 +71,16 @@ raven_rtr_aspa_count{cache="localhost:3323"}         # Total ASPA records loaded
 raven_rtr_last_sync_seconds{cache="localhost:3323"}  # Unix timestamp of last sync
 raven_rtr_serial_number{cache="localhost:3323"}      # Current RTR serial
 raven_rtr_cache_stale{cache="localhost:3323"}        # 1=stale, 0=fresh
-raven_rtr_sync_duration_seconds{cache="localhost:3323"}
+raven_rtr_sync_duration_seconds{cache="localhost:3323"}   # Histogram of sync durations
+
+**RTR anomaly detection:**
+
+Emitted by the adaptive anomaly detector in `raven rtr monitor` when it is run
+with `--prometheus`. `severity` is `high` or `medium`. See
+[CLI Reference → raven rtr monitor](cli-reference.md#raven-rtr-monitor).
+
+raven_rtr_anomaly_total{cache="localhost:3323", severity="high"}     # Count of anomalies, by severity
+raven_rtr_anomaly_last_timestamp{cache="localhost:3323"}             # Unix timestamp of most recent anomaly
 
 ### Useful PromQL Queries
 
@@ -121,6 +129,14 @@ groups:
           severity: critical
         annotations:
           summary: "RAVEN BMP session is down"
+
+      - alert: RAVENRTRAnomaly
+        expr: increase(raven_rtr_anomaly_total{severity="high"}[10m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "RAVEN detected a high-severity RTR sync anomaly"
 ```
 
 ## Grafana
@@ -164,6 +180,11 @@ The pre-built dashboard includes:
 - ASPA count over time
 - Cache sync latency
 - Session state — alert panel turns red if cache goes down
+
+**RTR Anomaly Detection**
+
+- Total RTR Anomalies — `raven_rtr_anomaly_total`, broken down by severity
+- Time Since Last Anomaly — driven by `raven_rtr_anomaly_last_timestamp`
 
 **BMP Session Health**
 

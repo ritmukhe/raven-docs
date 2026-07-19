@@ -345,6 +345,11 @@ For conference presentations, run the scenarios in this order:
 14. `recommend` — show the ASPA recommender output
 15. `down` — clean shutdown
 
+The [RTR anomaly detection demo](#scenario-12-rtr-anomaly-detection) (Scenario
+12) is **not** part of this sequence — it runs in its own standalone
+environment (Routinator + Grafana + `raven rtr monitor`, no Containerlab
+topology) with its own `anomaly-setup` / `anomaly-down` lifecycle.
+
 ---
 
 ## Phase 3 Scenarios
@@ -483,3 +488,80 @@ This runs non-interactively:
 4. Cleanup
 
 Use this for rehearsing the full Phase 3 demo flow.
+
+---
+
+## Scenario 12 — RTR Anomaly Detection
+
+**What it demonstrates:** RAVEN's adaptive anomaly detector flagging a
+statistically abnormal RTR sync in real time — a sudden flood of new VRPs from
+the RPKI validator — with no BGP or route change involved at all.
+
+**Mechanism:** A large batch of ROAs is bulk-added to Routinator's SLURM local
+exceptions at once. Routinator picks them up on its next refresh and pushes a
+single incremental RTR update, so RAVEN's next sync reports a `vrp_announced`
+count far past its learned baseline (P99 ~107 announced, historical max ~293).
+That trips the detector's hard threshold on `vrp_announced` and emits an anomaly
+of category `statistical`, severity `high`.
+
+!!! note
+    Unlike Scenarios 1–11, this runs in a **standalone environment** —
+    Routinator plus the Grafana/Prometheus stack and a background
+    `raven rtr monitor`. It does not use the Containerlab BGP topology, and it
+    has its own setup and teardown.
+
+**Prerequisite — seed the detector baseline** (one-time; skips the ~25 h live
+warm-up so the detector starts warm):
+
+```bash
+raven rtr seed-baseline \
+  --input ~/rtr-baseline.ndjson \
+  --output ~/.raven/anomaly-baseline.json
+```
+
+**Bring up the demo environment:**
+
+```bash
+bash lab/demo-master.sh anomaly-setup
+```
+
+This starts Routinator (short refresh), the Grafana/Prometheus stack, and
+`raven rtr monitor` warm-started from the seeded baseline, exposing metrics on
+`:9595`. Watch for anomalies in a second terminal:
+
+```bash
+tail -f <monitor --log-file> | grep '"event_type":"anomaly"'
+```
+
+(or watch the `raven_rtr_anomaly_total` counter on `:9595` / in Grafana).
+
+**Inject the churn:**
+
+```bash
+bash lab/04-rtr-anomaly.sh
+```
+
+Within a few seconds of Routinator publishing the new data, RAVEN's next sync
+emits an anomaly record on the monitor's NDJSON log:
+{"timestamp":"2026-07-16T14:23:07Z","cache":"localhost:3323","event_type":"anomaly","category":"statistical","trigger":"vrp_announced","severity":"high","z_scores":{"vrp_announced":9.4},"raw":{"vrp_announced":1200}}
+
+**What you will see in Grafana:**
+
+- `Total RTR Anomalies` (`raven_rtr_anomaly_total`) increments
+- `Time Since Last Anomaly` resets to ~0
+
+**Why this matters:** A validator that suddenly serves a large, unexpected batch
+of VRPs — through misconfiguration, a bad SLURM edit, or a compromised RPKI CA —
+can silently change how thousands of routes validate. RAVEN learns each cache's
+normal sync rhythm and flags departures from it, turning an invisible
+control-plane event into an actionable alert. See
+[Observability & Metrics](../user-guide/observability.md#available-metrics) for
+the anomaly metrics and a ready-to-use alert rule.
+
+**Clean up:**
+
+```bash
+bash lab/04-rtr-anomaly.sh --clean     # withdraw injected ROAs (a matching vrp_withdrawn spike, then baseline)
+bash lab/demo-master.sh anomaly-clean  # stop the raven rtr monitor
+bash lab/demo-master.sh anomaly-down   # full teardown of the anomaly environment
+```
