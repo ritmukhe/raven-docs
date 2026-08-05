@@ -65,6 +65,19 @@ failing AS. Will become more detectable as ASPA adoption grows.
     leaks are usually accidental misconfigurations, not malicious. Investigate
     before taking action.
 
+!!! note "New baseline behaviour on unauthorised direct sessions"
+    ASPA verification now checks the first hop of the AS_PATH — whether your
+    immediate peer's ASPA record lists your own AS as an authorised provider.
+    If it doesn't, **every** prefix received over that session shows
+    `path-suspect`, not just customer-originated leaks — including
+    connected-link and infrastructure prefixes that have nothing to do with
+    a misconfiguration on the other end. This is correct behaviour, not
+    noise: it means the session itself isn't in a customer-provider (or
+    otherwise ASPA-authorised) relationship with you. If you see
+    `path-suspect` across an entire peer's routes rather than on one or two
+    prefixes, check whether that peer's ASPA record includes your AS as a
+    provider before assuming a leak.
+
 ---
 
 ### path-only
