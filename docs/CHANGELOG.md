@@ -23,7 +23,28 @@ All notable changes to RAVEN are recorded here.
   with full (non-incremental) RTR syncs, which previously produced a
   false-positive high-severity anomaly on every `raven rtr monitor`
   startup.
-  
+- Upstream ASPA verification (`internal/validation/aspa`) now checks the
+  first hop of the AS_PATH — whether the immediate peer AS lists the
+  monitoring router's own AS as an authorised provider. This check
+  previously stopped one hop short, so a real route-propagation
+  misconfiguration over a peering session without a matching ASPA
+  provider entry resolved as `ASPA:Unknown` instead of `ASPA:Invalid`.
+  Single-AS-path routes, previously short-circuited to `Unknown` with no
+  check at all, are now actually evaluated.
+- Adds `LocalASN` to `Route`, learned per BMP session from the Peer Up
+  message's Sent OPEN (RFC 6793 four-octet AS capability preferred when
+  present) via new `parseOpenLocalASN()` in `internal/bmp/parser.go`.
+  No config changes needed.
+
+### Changed
+- Any direct BGP session where the peer's ASPA record does not list the
+  local AS as a provider now shows `path-suspect` for every prefix
+  received over that session — not just customer-originated
+  misannouncements, but connected-link and infrastructure prefixes too.
+  This is correct per draft-ietf-sidrops-aspa-verification, not a
+  regression; see
+  [Security Postures](user-guide/security-postures.md#path-suspect).
+
 ## v0.3.3 (2026-07-02)
 
 ### Added
