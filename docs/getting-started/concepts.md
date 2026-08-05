@@ -70,15 +70,32 @@ routing table via BMP.
 ## ASPA Path Verification
 
 ASPA path verification (draft-ietf-sidrops-aspa-verification-24) walks the
-AS_PATH of a received route and checks each hop:
+AS_PATH of a received route and checks each hop, including the first one —
+the hop between the monitored router and its immediate BGP peer:
 
 - Does AS_i have an ASPA record?
 - If yes, is AS_i-1 (the next hop toward you) listed as an authorised provider?
+- For the first hop, is the monitoring router's own AS listed as an
+  authorised provider in the immediate peer's ASPA record?
+
+That first-hop check matters because it's the only one that can catch a
+misconfiguration on the session directly attached to your router — without
+it, ASPA verification stops one hop short of you and a real leak over that
+session resolves as `Unknown` rather than `Invalid`. It's also why
+single-AS-path routes (a route whose AS_PATH is just the peer's own AS) are
+evaluated at all, instead of being short-circuited to `Unknown`.
+
+To run this check, RAVEN needs to know the monitored router's own AS. It
+learns this per BMP session (`LocalASN` on `Route`) from the Peer Up
+message's Sent OPEN — preferring the RFC 6793 four-octet AS capability when
+the peer advertises it, falling back to the two-octet AS field otherwise.
+This is discovered automatically; there's nothing to configure.
 
 A route leak occurs when an AS re-announces routes in the wrong direction —
 for example, a customer announcing a provider's routes to another provider.
 This creates an AS_PATH where a hop is not an authorised customer-provider
-relationship. ASPA catches this.
+relationship. ASPA catches this, including leaks that happen on the
+directly-connected peering session itself.
 
 **Result states:**
 
@@ -88,6 +105,15 @@ relationship. ASPA catches this.
 | **Invalid** | At least one hop violates a published ASPA record — possible route leak |
 | **Unknown** | Some ASes in the path have no ASPA records — cannot verify |
 | **Unverifiable** | AS_PATH contains AS_SETs or other constructs that prevent verification |
+
+!!! note
+    Because the first hop is now checked, any direct BGP session where the
+    peer's ASPA record doesn't list your AS as a provider will show
+    `path-suspect` for **every** prefix received over that session — not
+    just customer route leaks, but connected-link and infrastructure
+    prefixes too. That's expected behaviour per the draft, not a false
+    positive. See [Security Postures](../user-guide/security-postures.md#path-suspect)
+    for how to read it.
 
 ## IPv6 Support
 
