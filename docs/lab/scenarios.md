@@ -565,3 +565,93 @@ bash lab/04-rtr-anomaly.sh --clean     # withdraw injected ROAs (a matching vrp_
 bash lab/demo-master.sh anomaly-clean  # stop the raven rtr monitor
 bash lab/demo-master.sh anomaly-down   # full teardown of the anomaly environment
 ```
+
+---
+
+## Scenario 13 — ASPA First-Hop Route-Leak Detection (Workshop Lab)
+
+**What it demonstrates:** The first-hop ASPA check closes a one-hop gap in
+upstream verification — a route-propagation misconfiguration on the session
+*directly attached* to the monitored router, not one further up the
+AS_PATH, now resolves to `ASPA:Invalid` instead of `ASPA:Unknown`.
+
+!!! note
+    This scenario runs in the workshop lab topology — `frr-attacker`
+    (AS64509) peering directly with `sros-2` (AS64500) — not the
+    `demo-master.sh` Containerlab lab used in Scenarios 1–12. RAVEN is
+    BMP-attached to `sros-2`.
+
+**Topology:**
+
+- `frr-attacker` (AS64509) — test peer. Its ASPA record's provider set
+  does **not** include AS64500.
+- `sros-2` (AS64500) — the monitoring router.
+- Prefix under test: `198.51.100.0/24`, originated by AS64509 with a valid
+  ROA — ROV passes on this prefix regardless, so this is purely an ASPA
+  scenario, not an origin hijack.
+
+**Baseline — before propagating the prefix:**
+
+```bash
+raven routes --peer <frr-attacker-bmp-ip>
+```
+No entry for `198.51.100.0/24` from this peer yet. Legitimate paths for the
+same prefix learned via other sessions are unaffected by anything in this
+scenario and stay at their existing posture, e.g.:
+PREFIX             PEER            ORIGIN   ROV    ASPA     POSTURE
+198.51.100.0/24    <other-peer>    AS64509  Valid  Unknown  origin-only
+
+**Propagate `198.51.100.0/24` from frr-attacker to sros-2:**
+
+```bash
+# on frr-attacker
+vtysh -c "conf t" -c "router bgp 64509" -c "network 198.51.100.0/24"
+```
+
+**What you will see in `raven watch`:**
+[09:41:12] NEW  198.51.100.0/24  via sros-2  AS64509  ROV:Valid  ASPA:Invalid  posture:path-suspect
+AS_PATH: [64509]
+Failing hop: AS64509→AS64500 — AS64500 not in AS64509 ASPA provider set
+Reason: first-hop check — AS64500 (local AS) is not an authorised provider in AS64509's ASPA record
+
+Note the single-AS AS_PATH — this is exactly the case that, before the fix,
+was short-circuited straight to `Unknown` without any check at all.
+
+**CLI investigation:**
+
+```bash
+raven routes --peer <frr-attacker-bmp-ip> --posture path-suspect
+```
+PREFIX             PEER      ORIGIN   ROV    ASPA     POSTURE
+198.51.100.0/24    sros-2    AS64509  Valid  Invalid  path-suspect
+
+```bash
+raven routes --prefix 198.51.100.0/24 --format json
+```
+
+The `aspa` field's `failing_hop` shows `AS64509 → AS64500` with the
+first-hop provider check as the reason. Legitimate paths for the same
+prefix over other sessions are untouched — they remain `ASPA:Unknown` /
+`posture:origin-only`, since nothing about ASPA coverage further up those
+paths has changed.
+
+**Withdraw and confirm clean revert:**
+
+```bash
+# on frr-attacker
+vtysh -c "conf t" -c "router bgp 64509" -c "no network 198.51.100.0/24"
+```
+
+`raven watch` shows the route withdrawn, and `raven routes --peer
+<frr-attacker-bmp-ip>` returns to baseline — no entry for
+`198.51.100.0/24` from this peer.
+
+**Why this matters:** Before this fix, a misconfiguration like this one —
+on the session directly attached to your monitored router, not several
+hops up the AS_PATH — resolved as `ASPA:Unknown`, indistinguishable from
+ordinary missing ASPA coverage. The first-hop check is what makes it
+`Invalid`: it's the only check that evaluates the relationship between the
+peer and *you*. See [ASPA Path Verification](../getting-started/concepts.md#aspa-path-verification)
+for the full algorithm, and [Security Postures](../user-guide/security-postures.md#path-suspect)
+for the operational note on baseline behaviour this introduces for
+sessions without a matching ASPA provider entry.
