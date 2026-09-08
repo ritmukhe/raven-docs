@@ -5,6 +5,34 @@ All notable changes to RAVEN are recorded here.
 ## Unreleased
 
 ### Added
+- On-demand global BGP visibility correlation via the RIPEstat Data API.
+  RAVEN's ROV/ASPA validation is local-vantage-point only and cannot
+  distinguish a globally propagated hijack from a purely local leak; this
+  compares the local BMP-observed origin for a prefix against the origin
+  ASNs that RIS route collectors see for it. Verdicts are `match`,
+  `divergent`, `local_only` or `inconclusive`.
+- `raven check global --prefix <cidr> [--origin-asn N] [--format table|json]`
+  — one-shot correlation showing the local BMP view beside the global view
+  with a consensus verdict. Works without a running daemon when
+  `--origin-asn` is supplied.
+- New `external.ripestat` config section (`enabled`, `base-url`, `timeout`,
+  `cache-ttl`, `rate-limit-per-min`), defaulting to disabled. Existing
+  `raven.yaml` files are unaffected without an explicit opt-in.
+- New Event Engine action type `global-correlate`, configurable per rule
+  with an optional `cache_ttl`. It runs before the rule's other actions and
+  annotates the event, so webhook payloads gain a `global_visibility` field
+  and the `log` action gains `global_*` keys. Rules that do not use it are
+  unaffected. Correlation runs in the Event Engine's own goroutines behind a
+  per-prefix cache, a token-bucket rate limiter and a concurrency bound —
+  never on the BMP ingest or validation path, and with no per-route external
+  HTTP calls.
+- New Prometheus metrics: `raven_global_check_total{source,result}` and
+  `raven_global_check_latency_seconds`.
+
+  The result is a standalone annotation: it does not feed into
+  `SecurityPosture` and the ROV × ASPA posture matrix is unchanged. The
+  whole path is fail-open — an unreachable, slow or malformed RIPEstat
+  degrades to `inconclusive` and never crashes RAVEN or blocks an action.
 - RTR anomaly detection: adaptive median/MAD-based detector for RTR sync
   telemetry (interval, duration, VRP/ASPA churn) with per-cache rolling
   baselines, hard-trip and correlated-trip classification.
@@ -19,6 +47,10 @@ All notable changes to RAVEN are recorded here.
   anomaly detection (bulk SLURM ROA injection, serial-based confirmation).
 
 ### Fixed
+- CLI errors are now printed to stderr. The root command sets
+  `SilenceErrors`, so cobra did not print returned errors and `main`
+  discarded them — every CLI failure exited 1 with no output at all,
+  including config validation errors and commands' actionable hints.
 - RTR anomaly detector no longer evaluates or contaminates its baseline
   with full (non-incremental) RTR syncs, which previously produced a
   false-positive high-severity anomaly on every `raven rtr monitor`

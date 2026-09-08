@@ -51,6 +51,10 @@ outputs:
     path: "/metrics"
   otel:                             # optional OTLP export (see below)
     enabled: false
+
+external:                           # optional third-party correlation (see below)
+  ripestat:
+    enabled: false
   # kafka:                          # optional event sink
   #   brokers: ["localhost:9092"]
   #   topic: "raven-events"
@@ -377,6 +381,7 @@ events:
 | `log` | Log the event at the specified level |
 | `webhook` | HTTP POST with JSON payload, HMAC-SHA256 signed |
 | `flowspec` | Generate a Flowspec drop rule, inject via GoBGP |
+| `global-correlate` | Query external global BGP visibility and annotate the event. See [External Correlation](#external-correlation-ripestat) |
 
 **Cooldown** — Minimum time between repeated firings of the same rule for the
 same prefix+peer combination. Prevents alert storms during flapping.
@@ -422,6 +427,143 @@ authorized originators in matched VRPs — present only when there are covering 
     Always start with `dry_run: true`. Use `raven flowspec list` to review
     generated rules, then toggle specific rules live with
     `raven flowspec toggle "<key>"` when you are confident they are correct.
+
+---
+
+## External Correlation (RIPEstat)
+
+The `external` section configures correlation against third-party routing
+data. RAVEN makes **no outbound calls** to these providers unless you opt in
+here — every provider defaults to disabled.
+
+```yaml
+external:
+  ripestat:
+    enabled: false                 # must be true for the global-correlate action
+    base-url: "https://stat.ripe.net"
+    timeout: 5s
+    cache-ttl: 60s
+    rate-limit-per-min: 10
+```
+
+**Options:**
+
+| Option | Default | Description |
+|---|---|---|
+| `enabled` | `false` | Allow the Event Engine's `global-correlate` action to query RIPEstat |
+| `base-url` | `https://stat.ripe.net` | RIPEstat origin, without the data-call path. Point this at a stub or mirror for testing |
+| `timeout` | `5s` | Bounds a single looking-glass query |
+| `cache-ttl` | `60s` | How long a per-prefix result stays usable, so a flapping route does not re-query on every event |
+| `rate-limit-per-min` | `10` | Per-instance lookup budget per minute, and the burst capacity. A good-citizen safeguard against hammering RIPEstat |
+
+### Why This Exists
+
+RAVEN's ROV and ASPA validation is local-vantage-point only: it knows what
+your own BMP-attached routers received. That cannot distinguish a real hijack
+the rest of the internet also sees from a purely local leak or
+misconfiguration. Correlating against RIS route collectors closes that gap.
+
+### The `global-correlate` Action
+
+`enabled: true` makes a new Event Engine action type available. It queries
+the looking-glass for the event's prefix and compares the globally-observed
+origin ASNs against RAVEN's local BMP-observed origin.
+
+```yaml
+external:
+  ripestat:
+    enabled: true
+
+events:
+  rules:
+    - name: "correlate-suspicious-routes"
+      trigger:
+        type: posture_change
+        postures: ["origin-invalid", "path-suspect"]
+      cooldown: 60s
+      actions:
+        - type: global-correlate
+          cache_ttl: 60s        # optional; defaults to external.ripestat.cache-ttl
+        - type: log
+          level: warn
+        - type: webhook
+          url: "https://hooks.example.com/raven"
+```
+
+**Action options:**
+
+| Option | Default | Description |
+|---|---|---|
+| `cache_ttl` | `external.ripestat.cache-ttl` | This rule's freshness requirement. A cached result younger than this is reused instead of re-querying |
+
+`global-correlate` runs to completion **before** the rule's other actions,
+so they all observe the annotation. Ordering within the `actions` list does
+not matter.
+
+When a rule includes it, the webhook payload gains a `global_visibility`
+object and the `log` action gains `global_consensus`, `global_source`,
+`global_collectors`, `global_majority_origin` and `global_error` keys. Rules
+without the action are completely unaffected — no new webhook field, no new
+log keys.
+
+```json
+{
+  "id": "b65b80a6-...",
+  "type": "posture_change",
+  "prefix": "203.0.113.0/24",
+  "origin_asn": 64511,
+  "new_posture": "origin-invalid",
+  "global_visibility": {
+    "queried": true,
+    "source": "ripestat",
+    "queried_at": "2026-09-08T14:23:01Z",
+    "local_origin": 64511,
+    "global_origins": [
+      { "asn": 65000, "collector_count": 18 },
+      { "asn": 64511, "collector_count": 4 }
+    ],
+    "consensus": "divergent",
+    "collector_count": 22,
+    "latency_ns": 512000000
+  }
+}
+```
+
+**Consensus values:**
+
+| Value | Meaning |
+|---|---|
+| `match` | The local origin is the single most-observed origin globally |
+| `divergent` | The world's majority origin is not the local origin, or the local origin is only tied for most-observed (a MOAS conflict) |
+| `local_only` | No collector sees this prefix at all — a local leak or misconfiguration, not a propagated hijack |
+| `inconclusive` | Query failed, timed out, returned malformed data, was suppressed by the rate limiter, or there was no local origin to compare against. `error` carries the cause |
+
+### Operational Guarantees
+
+- **Never on the hot path.** Correlation runs in the Event Engine's own
+  goroutines, never in BMP ingest or validation. There are no per-route
+  external HTTP calls: it fires only on a matching rule, behind the cache
+  and rate limiter.
+- **Bounded.** At most 4 correlations are in flight at once, each with its
+  own 10s timeout, on top of the per-minute budget.
+- **Fail-open.** An unreachable, slow or malformed RIPEstat produces an
+  `inconclusive` annotation. It never crashes RAVEN, fails a rule, or blocks
+  any other action.
+- **A separate annotation.** The result does not feed into the route's
+  [security posture](security-postures.md); the ROV × ASPA matrix is
+  unchanged.
+- **Fails loudly on misconfiguration.** A rule using `global-correlate`
+  while `external.ripestat.enabled` is `false` is rejected at startup,
+  rather than silently emitting `inconclusive` annotations forever.
+
+For the equivalent one-shot check from the command line, see
+[CLI Reference → raven check global](cli-reference.md#raven-check-global).
+That command does not require `enabled: true`.
+
+!!! note
+    Counts are in units of **collector peers** — one (route collector, peer
+    address) pair — not collectors. A single RIS collector peering with 30
+    networks contributes up to 30 observations.
 
 ---
 

@@ -82,6 +82,27 @@ with `--prometheus`. `severity` is `high` or `medium`. See
 raven_rtr_anomaly_total{cache="localhost:3323", severity="high"}     # Count of anomalies, by severity
 raven_rtr_anomaly_last_timestamp{cache="localhost:3323"}             # Unix timestamp of most recent anomaly
 
+**External global-visibility correlation:**
+
+Emitted when the Event Engine's `global-correlate` action runs, which requires
+`external.ripestat.enabled: true`. `result` is the consensus verdict:
+`match`, `divergent`, `local_only` or `inconclusive`. See
+[Configuration → External Correlation](configuration.md#external-correlation-ripestat).
+
+raven_global_check_total{source="ripestat", result="match"}          # Count of correlations, by source and verdict
+raven_global_check_latency_seconds                                   # Histogram of correlation latency
+
+`raven_global_check_total` is a counter vector, so a given `result` series
+does not appear until that verdict has occurred at least once.
+`raven_global_check_latency_seconds` covers cache hits as well as live
+lookups, so it is a distribution over both — cache hits land in the smallest
+buckets.
+
+!!! note
+    `raven check global` runs in its own short-lived CLI process, so its
+    correlations are never scraped. These metrics reflect daemon-side
+    correlations only.
+
 ### Useful PromQL Queries
 
 **Percentage of routes that are origin-invalid:**
@@ -137,7 +158,36 @@ groups:
           severity: critical
         annotations:
           summary: "RAVEN detected a high-severity RTR sync anomaly"
+
+      - alert: RAVENGlobalDivergence
+        expr: increase(raven_global_check_total{result="divergent"}[10m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Global BGP view disagrees with RAVEN's local origin — likely a propagated hijack"
+
+      - alert: RAVENGlobalCheckInconclusive
+        expr: |
+          increase(raven_global_check_total{result="inconclusive"}[30m])
+          /
+          increase(raven_global_check_total[30m]) > 0.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "More than half of global-visibility correlations are failing — check RIPEstat reachability and the rate limit"
 ```
+
+**Global correlation verdict rate:**
+
+```promql
+sum by (result) (increase(raven_global_check_total[1h]))
+```
+
+A high `local_only` rate is worth investigating on its own: those prefixes
+exist in your RIB but no route collector carries them, which points at leaks
+or misconfiguration rather than hijacks.
 
 ## Grafana
 
