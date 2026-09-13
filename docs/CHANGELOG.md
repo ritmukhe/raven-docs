@@ -26,8 +26,12 @@ All notable changes to RAVEN are recorded here.
   per-prefix cache, a token-bucket rate limiter and a concurrency bound —
   never on the BMP ingest or validation path, and with no per-route external
   HTTP calls.
-- New Prometheus metrics: `raven_global_check_total{source,result}` and
-  `raven_global_check_latency_seconds`.
+- New Prometheus metrics: `raven_global_check_total{source,result}`,
+  `raven_global_check_latency_seconds`, and
+  `raven_global_check_rate_limited_total{source}`. The last counts lookups
+  the local rate limiter suppressed, which are deliberately kept off the
+  other two: a policy decision that costs no network call must stay
+  distinguishable from a provider RAVEN could not reach.
 
   The result is a standalone annotation: it does not feed into
   `SecurityPosture` and the ROV × ASPA posture matrix is unchanged. The
@@ -54,6 +58,15 @@ All notable changes to RAVEN are recorded here.
   exit 0 — so a single mis-indented key left an operator with a daemon that
   looked healthy and validated nothing. A missing config file stays
   non-fatal: RAVEN still runs on defaults when no `raven.yaml` exists.
+- Global-visibility lookups suppressed by the local rate limiter are no
+  longer reported as queries. The result now carries `queried: false` and
+  no `latency_ns`, instead of `queried: true` with a sub-microsecond
+  latency for a call that never left the process. They are counted on the
+  new `raven_global_check_rate_limited_total{source}` rather than folded
+  into `raven_global_check_total{result="inconclusive"}`, and contribute no
+  observation to `raven_global_check_latency_seconds`, which now describes
+  only real network attempts. In Prometheus and Grafana, "the rate limiter
+  fired" and "RIPEstat was unreachable" are now separate signals.
 - CLI errors are now printed to stderr. The root command sets
   `SilenceErrors`, so cobra did not print returned errors and `main`
   discarded them — every CLI failure exited 1 with no output at all,
