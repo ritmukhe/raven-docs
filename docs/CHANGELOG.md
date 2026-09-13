@@ -27,11 +27,14 @@ All notable changes to RAVEN are recorded here.
   never on the BMP ingest or validation path, and with no per-route external
   HTTP calls.
 - New Prometheus metrics: `raven_global_check_total{source,result}`,
-  `raven_global_check_latency_seconds`, and
-  `raven_global_check_rate_limited_total{source}`. The last counts lookups
-  the local rate limiter suppressed, which are deliberately kept off the
-  other two: a policy decision that costs no network call must stay
-  distinguishable from a provider RAVEN could not reach.
+  `raven_global_check_latency_seconds`,
+  `raven_global_check_rate_limited_total{source}` and
+  `raven_global_check_cache_hits_total{source}`. The last two count the
+  lookups that made no network round-trip — suppressed by the local rate
+  limiter, or served from the in-process cache — and are deliberately kept
+  off the latency histogram, which covers live lookups only. A policy
+  decision and a warm cache must both stay distinguishable from a provider
+  RAVEN could not reach.
 
   The result is a standalone annotation: it does not feed into
   `SecurityPosture` and the ROV × ASPA posture matrix is unchanged. The

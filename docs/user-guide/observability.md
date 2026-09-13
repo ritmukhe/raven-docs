@@ -90,13 +90,33 @@ Emitted when the Event Engine's `global-correlate` action runs, which requires
 [Configuration → External Correlation](configuration.md#external-correlation-ripestat).
 
 raven_global_check_total{source="ripestat", result="match"}          # Count of correlations, by source and verdict
-raven_global_check_latency_seconds                                   # Histogram of correlation latency
+raven_global_check_latency_seconds                                   # Histogram of correlation latency (live lookups only)
+raven_global_check_cache_hits_total{source="ripestat"}               # Correlations served from the in-process cache
+raven_global_check_rate_limited_total{source="ripestat"}             # Lookups suppressed by the local rate limiter
 
 `raven_global_check_total` is a counter vector, so a given `result` series
 does not appear until that verdict has occurred at least once.
-`raven_global_check_latency_seconds` covers cache hits as well as live
-lookups, so it is a distribution over both — cache hits land in the smallest
-buckets.
+
+`raven_global_check_latency_seconds` covers only correlations that actually
+went to the provider. Cache hits and rate-limited lookups make no network
+round-trip, so their near-zero timings are excluded — otherwise a warm cache
+would pull p50/p95 toward zero and mask the provider latency degradation you
+would want to alert on. Those two are counted on
+`raven_global_check_cache_hits_total` and
+`raven_global_check_rate_limited_total` instead, so the activity stays
+visible.
+
+A rate-limited lookup is a local policy decision, not a failure, so it does
+not appear on `raven_global_check_total` at all. A cache hit does: it
+produced a real verdict.
+
+Cache hit ratio:
+
+```promql
+rate(raven_global_check_cache_hits_total[5m])
+/
+rate(raven_global_check_total[5m])
+```
 
 !!! note
     `raven check global` runs in its own short-lived CLI process, so its
@@ -176,7 +196,7 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "More than half of global-visibility correlations are failing — check RIPEstat reachability and the rate limit"
+          summary: "More than half of global-visibility correlations are failing — check RIPEstat reachability"
 ```
 
 **Global correlation verdict rate:**
