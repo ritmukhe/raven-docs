@@ -47,6 +47,13 @@ All notable changes to RAVEN are recorded here.
   anomaly detection (bulk SLURM ROA injection, serial-based confirmation).
 
 ### Fixed
+- A `raven.yaml` that exists but does not parse is now fatal. RAVEN prints
+  the error (naming the offending file) to stderr and exits 1. Previously a
+  YAML syntax error printed one line and then started the daemon anyway on
+  silently-defaulted config — `rtr_caches:0`, no BMP peers, no event rules,
+  exit 0 — so a single mis-indented key left an operator with a daemon that
+  looked healthy and validated nothing. A missing config file stays
+  non-fatal: RAVEN still runs on defaults when no `raven.yaml` exists.
 - CLI errors are now printed to stderr. The root command sets
   `SilenceErrors`, so cobra did not print returned errors and `main`
   discarded them — every CLI failure exited 1 with no output at all,
