@@ -262,6 +262,50 @@ The pre-built dashboard includes:
 - Route count per peer
 - Session up/down events
 
+**Global BGP Visibility Correlation**
+
+The last row on the dashboard, after RTR Anomaly Detection. It is fed by the
+Event Engine's `global-correlate` action, so it stays empty until
+`external.ripestat.enabled: true` and a rule using that action fires. See
+[Configuration → External Correlation](configuration.md#external-correlation-ripestat).
+
+- Global Consensus Results — `rate(raven_global_check_total[5m])` by
+  `result`. Colour-matched to the security posture palette: match green,
+  divergent red, local_only amber, inconclusive grey.
+- Global Consensus — Current Totals — one stat per verdict, straight off the
+  `raven_global_check_total` counters. Reads `0` rather than "No data" before
+  the first correlation runs, so a verdict appearing is visible as a change.
+- RIPEstat Query Performance — cache hits
+  (`raven_global_check_cache_hits_total`), rate-limited calls
+  (`raven_global_check_rate_limited_total`) and live queries
+  (`raven_global_check_latency_seconds_count`) on one graph. This is the
+  panel to watch when tuning `cache-ttl` and `rate-limit-per-min`: rising
+  rate-limited calls mean the budget is too tight for your event volume.
+- RIPEstat Query Latency p50/p95 — quantiles over
+  `raven_global_check_latency_seconds`, in seconds. A p95 spike means
+  RIPEstat is slow or unreachable, not that RAVEN is busy.
+
+This row answers the question the posture panels cannot. When a prefix turns
+up as origin-invalid, the verdict here tells you how far the announcement
+actually spread. `local_only` ticking up on Current Totals means no route
+collector carries the prefix at all — the announcement never left your
+network, which points at a leak, a misconfiguration or a lab injection rather
+than a hijack the internet has accepted. `divergent` is the opposite and the
+more serious reading: the world sees a different origin than you do, so the
+bogus announcement has propagated. Global Consensus Results shows the same
+verdict as a rate over time, so you can see when it started.
+
+!!! note
+    The latency panels deliberately do not filter by `{source="ripestat"}`.
+    `raven_global_check_latency_seconds` is registered as a plain histogram
+    rather than a histogram vector, so it carries no `source` label — adding
+    the matcher would select no series and leave both panels empty.
+
+!!! tip
+    `lab/demo-master.sh setup` imports the dashboard through the Grafana API
+    with `overwrite: true`, so the demo lab picks this row up automatically —
+    no manual import step. See [Lab → Overview](../lab/overview.md).
+
 ### Running Grafana with Docker
 
 For the demo lab or a quick local setup:

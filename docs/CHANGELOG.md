@@ -40,6 +40,9 @@ All notable changes to RAVEN are recorded here.
   `SecurityPosture` and the ROV × ASPA posture matrix is unchanged. The
   whole path is fail-open — an unreachable, slow or malformed RIPEstat
   degrades to `inconclusive` and never crashes RAVEN or blocks an action.
+- Grafana: Global BGP Visibility Correlation dashboard row — consensus
+  results timeseries, current totals stat panel, RIPEstat query performance,
+  and latency p50/p95 panels (panels 17–20).
 - RTR anomaly detection: adaptive median/MAD-based detector for RTR sync
   telemetry (interval, duration, VRP/ASPA churn) with per-cache rolling
   baselines, hard-trip and correlated-trip classification.
