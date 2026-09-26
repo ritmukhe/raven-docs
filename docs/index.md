@@ -3,7 +3,7 @@
 
 *Documentation for RAVEN (bgp-routing-security-monitor) — BMP + RPKI ROV + ASPA path validation in a single binary.*
 
-Route validation is becoming router-native. Visibility into the RPKI infrastructure your router depends on for that validation is not — and that's where RAVEN is headed.
+Route validation is becoming router-native. Visibility into the RPKI infrastructure your router depends on for that validation is not. RAVEN provides that visibility.
 
 ---
 
@@ -58,7 +58,7 @@ ASPA has crossed into production availability — ARIN enabled ASPA object creat
 
 ROV and ASPA validation are becoming router-native. As vendors ship these checks directly in the data plane, the case for an external tool doing route-by-route validation gets weaker over time — that's the correct outcome for the ecosystem.
 
-What doesn't move onto the router is the health of the RPKI infrastructure itself. A router validates against whatever its RTR cache tells it — it has no way to notice that the cache's sync behavior just changed, that VRPs are being withdrawn in a pattern that doesn't match normal churn, or that one of several configured caches has silently stopped agreeing with the others. RAVEN's RTR monitoring and anomaly detection answer a different question than "is this route valid" — they answer "is the thing my router trusts to make that call behaving normally." That's infrastructure-layer observability, and it stays relevant however far ROV/ASPA adoption goes.
+What doesn't move onto the router is the health of the RPKI infrastructure itself. A router validates against whatever its RTR cache tells it — it has no way to notice that the cache's sync behavior just changed, that VRPs are being withdrawn in a pattern that doesn't match normal churn, or that the cache has started behaving differently from its own history. RAVEN's RTR monitoring and anomaly detection answer a different question than "is this route valid" — they answer "is the thing my router trusts to make that call behaving normally." That's infrastructure-layer observability, and it stays relevant however far ROV/ASPA adoption goes.
 
 ## Get Started
 
