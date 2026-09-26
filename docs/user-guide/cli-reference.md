@@ -442,6 +442,125 @@ BGP topology.
 
 ---
 
+## raven check global
+
+Correlates a prefix's local BMP-observed origin against the origin ASNs that
+third-party route collectors see for it, via the
+[RIPEstat looking-glass data call](https://stat.ripe.net/docs/02.data-api/looking-glass.html).
+
+RAVEN's ROV and ASPA validation is local-vantage-point only: it knows what
+your own BMP-attached routers received. That cannot tell you whether a
+suspicious route is a real hijack the rest of the internet also sees, or a
+purely local leak or misconfiguration. This check answers that question.
+
+```bash
+raven check global --prefix 203.0.113.0/24
+raven check global --prefix 203.0.113.0/24 --origin-asn 64511
+raven check global --prefix 203.0.113.0/24 --format json
+```
+
+**Flags:**
+
+| Flag | Default | Description |
+|---|---|---|
+| `--prefix` | required | Prefix to correlate (CIDR) |
+| `--origin-asn` | — | Origin ASN to compare against. Defaults to the daemon's BMP-observed origin for the prefix |
+| `--format` | table | Output format: `table` or `json` |
+
+**Verdicts:**
+
+| Verdict | Meaning |
+|---|---|
+| `MATCH` | The local origin is the single most-observed origin globally — the route looks the same from outside |
+| `DIVERGENT` | The world's majority origin is not the local origin, or the local origin is only tied for most-observed (a MOAS conflict) |
+| `LOCAL_ONLY` | No collector sees this prefix at all — points at a local leak or misconfiguration, not a propagated hijack |
+| `INCONCLUSIVE` | The query failed, timed out, returned malformed data, or there was no local origin to compare against |
+
+`MATCH` requires a strict majority. A tie between the local origin and
+another ASN is reported as `DIVERGENT`: a MOAS conflict at equal global
+visibility still warrants a look.
+
+**Example — global match:**
+
+```
+$ raven check global --prefix 8.8.8.0/24
+Correlating global visibility for 8.8.8.0/24...
+
+Local view (BMP/RIB):
+  Route   : 8.8.8.0/24 via AS15169 (secured)
+  Peer    : 10.0.0.1 (AS65000), 1 route(s) in RIB
+  Local   : ROV Valid, ASPA Valid
+
+Global view (RIPEstat looking-glass, https://stat.ripe.net):
+  ORIGIN   COLLECTOR PEERS  SHARE  NOTE
+  AS15169  368              100%   matches local
+  368 collector peer observations in 608ms
+
+╔═══════════════════════════════════════════════════════════════════════════════════╗
+║ GLOBAL MATCH: Global majority origin matches local BMP view (368 collector peers) ║
+║ Local RIB says: AS15169 │ The internet says: AS15169                              ║
+╚═══════════════════════════════════════════════════════════════════════════════════╝
+```
+
+**Example — global divergence (the hijack is real and propagated):**
+
+```
+$ raven check global --prefix 203.0.113.0/24
+Correlating global visibility for 203.0.113.0/24...
+
+Local view (BMP/RIB):
+  Route   : 203.0.113.0/24 via AS64511 (origin-invalid)
+  Peer    : 10.0.3.2 (AS65099), 1 route(s) in RIB
+  Local   : ROV Invalid, ASPA Unknown
+
+Global view (RIPEstat looking-glass, https://stat.ripe.net):
+  ORIGIN   COLLECTOR PEERS  SHARE  NOTE
+  AS65000  18               82%
+  AS64511  4                18%    matches local
+  22 collector peer observations in 512ms
+
+╔════════════════════════════════════════════════════════════════════════════════════════╗
+║ GLOBAL DIVERGENCE DETECTED: MOAS conflict — 2 origins seen globally, most-observed ...  ║
+║ Local RIB says: AS64511 │ The internet says: AS65000                                    ║
+╚════════════════════════════════════════════════════════════════════════════════════════╝
+```
+
+**Example — local-only route (a leak, not a hijack):**
+
+```
+$ raven check global --prefix 203.0.113.0/24 --origin-asn 64511
+Global view (RIPEstat looking-glass, https://stat.ripe.net):
+  no observations — no route collector carries this prefix
+
+╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ LOCAL-ONLY ROUTE: No collector sees this prefix — a local leak or misconfiguration, not a propagated hijack  ║
+║ Local RIB says: AS64511 │ The internet says: nobody                                                         ║
+╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+```
+
+**Notes:**
+
+- The looking-glass call is **exact-match**. A more-specific prefix that no
+  collector carries returns no observations, which is exactly the
+  `LOCAL_ONLY` signal — not a query failure.
+- **Collector peers, not collectors.** Counts are in units of one
+  (route collector, peer address) pair, so a single RIS collector peering
+  with 30 networks contributes up to 30 observations.
+- This command reads `external.ripestat` from `raven.yaml` for the base URL,
+  timeout, cache TTL and rate limit, but does **not** require
+  `external.ripestat.enabled: true` — invoking it is itself the explicit
+  opt-in. The `enabled` flag gates only the Event Engine's automatic
+  correlation. See
+  [Configuration → External Correlation](configuration.md#external-correlation-ripestat).
+- Without `--origin-asn` the baseline comes from the daemon's RIB, so
+  `raven serve` must be reachable. With `--origin-asn` the check works
+  against no daemon at all.
+- It is **fail-open**: an unreachable or malformed RIPEstat degrades to
+  `INCONCLUSIVE` and exits 0. The result is a standalone annotation and does
+  not change the route's [security posture](security-postures.md).
+
+---
+
 ## raven flowspec list
 
 Show all active Flowspec mitigation rules in RAVEN's registry. Displays

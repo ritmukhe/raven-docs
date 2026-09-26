@@ -5,6 +5,44 @@ All notable changes to RAVEN are recorded here.
 ## Unreleased
 
 ### Added
+- On-demand global BGP visibility correlation via the RIPEstat Data API.
+  RAVEN's ROV/ASPA validation is local-vantage-point only and cannot
+  distinguish a globally propagated hijack from a purely local leak; this
+  compares the local BMP-observed origin for a prefix against the origin
+  ASNs that RIS route collectors see for it. Verdicts are `match`,
+  `divergent`, `local_only` or `inconclusive`.
+- `raven check global --prefix <cidr> [--origin-asn N] [--format table|json]`
+  — one-shot correlation showing the local BMP view beside the global view
+  with a consensus verdict. Works without a running daemon when
+  `--origin-asn` is supplied.
+- New `external.ripestat` config section (`enabled`, `base-url`, `timeout`,
+  `cache-ttl`, `rate-limit-per-min`), defaulting to disabled. Existing
+  `raven.yaml` files are unaffected without an explicit opt-in.
+- New Event Engine action type `global-correlate`, configurable per rule
+  with an optional `cache_ttl`. It runs before the rule's other actions and
+  annotates the event, so webhook payloads gain a `global_visibility` field
+  and the `log` action gains `global_*` keys. Rules that do not use it are
+  unaffected. Correlation runs in the Event Engine's own goroutines behind a
+  per-prefix cache, a token-bucket rate limiter and a concurrency bound —
+  never on the BMP ingest or validation path, and with no per-route external
+  HTTP calls.
+- New Prometheus metrics: `raven_global_check_total{source,result}`,
+  `raven_global_check_latency_seconds`,
+  `raven_global_check_rate_limited_total{source}` and
+  `raven_global_check_cache_hits_total{source}`. The last two count the
+  lookups that made no network round-trip — suppressed by the local rate
+  limiter, or served from the in-process cache — and are deliberately kept
+  off the latency histogram, which covers live lookups only. A policy
+  decision and a warm cache must both stay distinguishable from a provider
+  RAVEN could not reach.
+
+  The result is a standalone annotation: it does not feed into
+  `SecurityPosture` and the ROV × ASPA posture matrix is unchanged. The
+  whole path is fail-open — an unreachable, slow or malformed RIPEstat
+  degrades to `inconclusive` and never crashes RAVEN or blocks an action.
+- Grafana: Global BGP Visibility Correlation dashboard row — consensus
+  results timeseries, current totals stat panel, RIPEstat query performance,
+  and latency p50/p95 panels (panels 17–20).
 - RTR anomaly detection: adaptive median/MAD-based detector for RTR sync
   telemetry (interval, duration, VRP/ASPA churn) with per-cache rolling
   baselines, hard-trip and correlated-trip classification.
@@ -19,6 +57,26 @@ All notable changes to RAVEN are recorded here.
   anomaly detection (bulk SLURM ROA injection, serial-based confirmation).
 
 ### Fixed
+- A `raven.yaml` that exists but does not parse is now fatal. RAVEN prints
+  the error (naming the offending file) to stderr and exits 1. Previously a
+  YAML syntax error printed one line and then started the daemon anyway on
+  silently-defaulted config — `rtr_caches:0`, no BMP peers, no event rules,
+  exit 0 — so a single mis-indented key left an operator with a daemon that
+  looked healthy and validated nothing. A missing config file stays
+  non-fatal: RAVEN still runs on defaults when no `raven.yaml` exists.
+- Global-visibility lookups suppressed by the local rate limiter are no
+  longer reported as queries. The result now carries `queried: false` and
+  no `latency_ns`, instead of `queried: true` with a sub-microsecond
+  latency for a call that never left the process. They are counted on the
+  new `raven_global_check_rate_limited_total{source}` rather than folded
+  into `raven_global_check_total{result="inconclusive"}`, and contribute no
+  observation to `raven_global_check_latency_seconds`, which now describes
+  only real network attempts. In Prometheus and Grafana, "the rate limiter
+  fired" and "RIPEstat was unreachable" are now separate signals.
+- CLI errors are now printed to stderr. The root command sets
+  `SilenceErrors`, so cobra did not print returned errors and `main`
+  discarded them — every CLI failure exited 1 with no output at all,
+  including config validation errors and commands' actionable hints.
 - RTR anomaly detector no longer evaluates or contaminates its baseline
   with full (non-incremental) RTR syncs, which previously produced a
   false-positive high-severity anomaly on every `raven rtr monitor`
