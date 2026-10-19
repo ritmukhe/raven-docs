@@ -1,0 +1,3235 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Ravens see what you can't. Documentation for RAVEN (bgp-routing-security-monitor) — BMP + RPKI ROV + ASPA path validation in a single binary.">
+      
+      
+      
+        <link rel="canonical" href="https://ritmukhe.github.io/raven-docs/user-guide/cli-reference/">
+      
+      
+        <link rel="prev" href="../configuration/">
+      
+      
+        <link rel="next" href="../security-postures/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>CLI Reference - RAVEN</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#cli-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="RAVEN" class="md-header__button md-logo" aria-label="RAVEN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            RAVEN
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              CLI Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="amber"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/nokia/bgp-routing-security-monitor" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nokia/bgp-routing-security-monitor
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/install/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../configuration/" class="md-tabs__link">
+          
+  
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../lab/overview/" class="md-tabs__link">
+          
+  
+  
+  Demo Lab
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../deployment/production/" class="md-tabs__link">
+          
+  
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/data-model/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../troubleshooting/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Troubleshooting
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../CHANGELOG/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="RAVEN" class="md-nav__button md-logo" aria-label="RAVEN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    RAVEN
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/nokia/bgp-routing-security-monitor" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nokia/bgp-routing-security-monitor
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quick-start/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#global-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-serve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven serve
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven status
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-peers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven peers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="raven peers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-malformed-column" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The MALFORMED column
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-routes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven routes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="raven routes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-format-wide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --format wide
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-format-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --format json
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-validate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven validate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-watch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven watch
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-aspa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven aspa
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-aspa-recommend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven aspa recommend
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-what-if" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven what-if
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="raven what-if">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-reject-invalid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --reject-invalid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-aspa-enforce" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --aspa-enforce
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven version
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-audit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven audit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-check-stealthy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven check stealthy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-check-global" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven check global
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-flowspec-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven flowspec list
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-flowspec-toggle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven flowspec toggle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-rtr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven rtr
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-rtr-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven rtr monitor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-rtr-seed-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven rtr seed-baseline
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security-postures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Postures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../observability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observability & Metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../active-response/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Active Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo Lab
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Demo Lab
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../lab/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../lab/scenarios/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attack Scenarios
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/production/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/hardening/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Hardening
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deployment/scaling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/data-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/validation-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#global-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-serve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven serve
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven status
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-peers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven peers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="raven peers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-malformed-column" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The MALFORMED column
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-routes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven routes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="raven routes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-format-wide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --format wide
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-format-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --format json
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-validate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven validate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-watch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven watch
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-aspa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven aspa
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-aspa-recommend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven aspa recommend
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-what-if" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven what-if
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="raven what-if">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-reject-invalid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --reject-invalid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-aspa-enforce" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --aspa-enforce
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven version
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-audit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven audit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-check-stealthy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven check stealthy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-check-global" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven check global
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-flowspec-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven flowspec list
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-flowspec-toggle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven flowspec toggle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-rtr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven rtr
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-rtr-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven rtr monitor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raven-rtr-seed-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        raven rtr seed-baseline
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="cli-reference">CLI Reference</h1>
+<p>RAVEN is CLI-first. Every command connects to a running RAVEN daemon via the
+API (default: <code>localhost:11020</code>). Use <code>--address</code> to target a remote
+instance; that instance must set
+<a href="../configuration/#api-section"><code>api.listen</code></a> to an address you can reach,
+because the API binds to loopback by default.</p>
+<h2 id="global-flags">Global Flags</h2>
+<p>These persistent flags are accepted by every command:</p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--address</code></td>
+<td><code>localhost:11020</code></td>
+<td>RAVEN daemon address for CLI queries</td>
+</tr>
+<tr>
+<td><code>--config</code></td>
+<td><code>./raven.yaml</code></td>
+<td>Config file path (search order: <code>./raven.yaml</code>, then <code>/etc/raven/raven.yaml</code>). Only <code>serve</code> reads the daemon config</td>
+</tr>
+<tr>
+<td><code>--log-level</code></td>
+<td><code>info</code></td>
+<td>Log level: <code>debug</code>, <code>info</code>, <code>warn</code>, <code>error</code></td>
+</tr>
+<tr>
+<td><code>--log-format</code></td>
+<td><code>json</code></td>
+<td>Log format: <code>json</code> or <code>text</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>--format</code> is <strong>not</strong> a global flag. It is a per-command flag: <code>table</code> or
+<code>json</code> on most commands, <code>wide</code> as well on <code>raven routes</code>, and <code>markdown</code>
+on <code>raven audit</code>. <code>raven status</code>, <code>raven peers</code> and <code>raven validate</code> have
+no <code>--format</code>.
+Each command's flag table below lists whether it accepts <code>--format</code>.</p>
+</div>
+<hr />
+<h2 id="raven-serve">raven serve</h2>
+<p>Start the RAVEN daemon — BMP listener, RTR client, validation engine, and all
+configured outputs.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>raven<span class="w"> </span>serve
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>raven<span class="w"> </span>serve<span class="w"> </span>--config<span class="w"> </span>/etc/raven/raven.yaml
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>raven<span class="w"> </span>serve<span class="w"> </span>--config<span class="w"> </span>raven.yaml
+</code></pre></div>
+<p>RAVEN runs in the foreground. Use systemd, screen, or tmux for production.</p>
+<p><strong>What happens on startup:</strong></p>
+<ol>
+<li>Loads config file</li>
+<li>Starts Prometheus metrics endpoint</li>
+<li>Starts API server</li>
+<li>Connects to RTR caches — downloads VRPs and ASPA data</li>
+<li>Starts BMP listener — waits for router connections</li>
+<li>As routers connect, receives table dumps and begins validation</li>
+</ol>
+<hr />
+<h2 id="raven-status">raven status</h2>
+<p>Show the route table summary, RPKI state and every BMP peer.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>raven<span class="w"> </span>status
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>raven<span class="w"> </span>status<span class="w"> </span>--router<span class="w"> </span>edge1
+</code></pre></div>
+<p><strong>Flags:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--router</code></td>
+<td>List only this monitored router's peers: its BMP source address or its BMP sysName. The route table and RPKI totals stay daemon-wide</td>
+</tr>
+</tbody>
+</table>
+<p><code>raven status</code> has no <code>--format</code> flag. For JSON, read the API directly on
+the monitoring host:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>http://127.0.0.1:11020/api/v1/status
+</code></pre></div>
+<p><strong>Example output:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>RAVEN dev  uptime 2h14m5s
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Route Table: 5 routes received (Adj-RIB-In pre-policy)
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>  path-suspect         2
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>  path-only            1
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>  secured              1
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>  unverified           1
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>By RIB:
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>  adj-rib-in-pre       5
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>  adj-rib-out-pre      41
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>RPKI: 1 VRPs (serial 4821)
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>BMP Peers: 4
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>  ROUTER     PEER                      ASN    STATE  ROUTES  OUT
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>  edge1      198.51.100.1              64500  up     2       41
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>  edge1      198.51.100.2              64496  up     1       0
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>  edge1      192.0.2.250               64510  up     1       0
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>  192.0.2.2  2001:db8::2 rd 65000:100  64505  up     1       0
+</code></pre></div>
+<p><strong>Route Table</strong> and its posture breakdown count Adj-RIB-In pre-policy
+routes only: what your routers received, before import policy, comparable
+to the received-routes count on the router itself. Earlier releases added
+every RIB together, so a router that also sent post-policy or Adj-RIB-Out
+data inflated the total. The posture lines appear in no fixed
+order. <strong>By RIB</strong> appears when the table holds more than one RIB type and
+lists each one separately.</p>
+<p><strong>BMP Peers</strong> columns:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ROUTER</code></td>
+<td>The monitored router: its BMP sysName, or its BMP source address when it sent none</td>
+</tr>
+<tr>
+<td><code>PEER</code></td>
+<td>The BGP peer's address. A peer in a VRF shows the VRF's route distinguisher, as in <code>2001:db8::2 rd 65000:100</code></td>
+</tr>
+<tr>
+<td><code>ASN</code></td>
+<td>The peer's ASN</td>
+</tr>
+<tr>
+<td><code>STATE</code></td>
+<td><code>up</code> or <code>down</code></td>
+</tr>
+<tr>
+<td><code>ROUTES</code></td>
+<td>The peer's Adj-RIB-In pre-policy routes now in the table</td>
+</tr>
+<tr>
+<td><code>OUT</code></td>
+<td>The peer's Adj-RIB-Out pre-policy routes: what your router sends that peer (RFC 8671). Shown only when some peer has Adj-RIB-Out routes</td>
+</tr>
+</tbody>
+</table>
+<p>The same peer address on two routers, or in two VRFs of one router, is two
+rows, because RAVEN keys peers by router, peer distinguisher and address.
+<code>ROUTES</code> and <code>OUT</code> stay in separate columns so that received and sent routes
+are never added together.</p>
+<hr />
+<h2 id="raven-peers">raven peers</h2>
+<p>List every BMP peer with session metadata.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>raven<span class="w"> </span>peers
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>raven<span class="w"> </span>peers<span class="w"> </span>--router<span class="w"> </span>edge1
+</code></pre></div>
+<p><strong>Flags:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--router</code></td>
+<td>List only this monitored router's peers: its BMP source address or its BMP sysName</td>
+</tr>
+</tbody>
+</table>
+<p><code>raven peers</code> has no <code>--format</code> flag; for JSON, read
+<code>http://127.0.0.1:11020/api/v1/peers</code> on the monitoring host.</p>
+<p><strong>Example output:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>ROUTER     PEER                      ASN    ROUTER ID     STATE  ROUTES  OUT  UP SINCE
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>edge1      198.51.100.1              64500  198.51.100.1  up     2       41   2026-10-18T09:12:44Z
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>edge1      198.51.100.2              64496  198.51.100.2  up     1       0    2026-10-18T09:12:44Z
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>edge1      192.0.2.250               64510  192.0.2.250   up     1       0    2026-10-18T09:12:45Z
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>192.0.2.2  2001:db8::2 rd 65000:100  64505  203.0.113.5   up     1       0    2026-10-18T09:13:02Z
+</code></pre></div>
+<p>The <code>ROUTER</code>, <code>PEER</code>, <code>ROUTES</code> and <code>OUT</code> columns mean the same as in
+<a href="#raven-status"><code>raven status</code></a>. <code>ROUTER ID</code> is the peer's BGP identifier and
+<code>UP SINCE</code> the time its session came up (RFC 3339, UTC).</p>
+<h3 id="the-malformed-column">The MALFORMED column</h3>
+<p>When a peer has sent a malformed UPDATE that RFC 7606 answers with a
+session reset, <code>raven peers</code> adds a <code>MALFORMED</code> column. It shows the reason
+for that peer and <code>-</code> for every other peer:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ROUTER  PEER          ASN    ROUTER ID     STATE  ROUTES  UP SINCE              MALFORMED
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>edge1   198.51.100.1  64500  198.51.100.1  up     2       2026-10-18T09:12:44Z  mp_reach_next_hop
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>edge1   198.51.100.2  64496  198.51.100.2  up     1       2026-10-18T09:12:44Z  -
+</code></pre></div>
+<p>A marked peer's routes in RAVEN may be incomplete: RAVEN withdrew what it
+could parse from the bad UPDATE and expects the router to reset the BGP
+session. The mark clears when the router reports the peer up again (BMP
+Peer Up). The reason is a <code>raven_bmp_malformed_updates_total</code> reason, and
+the API's <code>/api/v1/peers</code> output carries it as <code>malformed_input</code>,
+<code>malformed_reason</code> and <code>malformed_since</code>. See
+<a href="../../troubleshooting/#malformed-bgp-input">Malformed BGP Input</a>.</p>
+<hr />
+<h2 id="raven-routes">raven routes</h2>
+<p>Query the route table. Without filters, RAVEN returns every Adj-RIB-In
+pre-policy route.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>raven<span class="w"> </span>routes
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>raven<span class="w"> </span>routes<span class="w"> </span>--prefix<span class="w"> </span><span class="m">203</span>.0.113.0/24
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>raven<span class="w"> </span>routes<span class="w"> </span>--origin-asn<span class="w"> </span><span class="m">64502</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>raven<span class="w"> </span>routes<span class="w"> </span>--peer<span class="w"> </span><span class="m">198</span>.51.100.1
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>raven<span class="w"> </span>routes<span class="w"> </span>--router<span class="w"> </span>edge1
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>raven<span class="w"> </span>routes<span class="w"> </span>--posture<span class="w"> </span>path-suspect
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>raven<span class="w"> </span>routes<span class="w"> </span>--prefix<span class="w"> </span><span class="m">203</span>.0.113.0/24<span class="w"> </span>--peer<span class="w"> </span><span class="m">198</span>.51.100.1
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>raven<span class="w"> </span>routes<span class="w"> </span>--posture<span class="w"> </span>path-suspect<span class="w"> </span>--format<span class="w"> </span>wide
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>raven<span class="w"> </span>routes<span class="w"> </span>--rib<span class="w"> </span>adj-rib-out-pre<span class="w"> </span>--posture<span class="w"> </span>origin-invalid
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>raven<span class="w"> </span>routes<span class="w"> </span>--format<span class="w"> </span>json
+</code></pre></div>
+<p><strong>Flags:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--prefix</code></td>
+<td>Filter by prefix (exact match)</td>
+</tr>
+<tr>
+<td><code>--origin-asn</code></td>
+<td>Filter by origin ASN</td>
+</tr>
+<tr>
+<td><code>--peer</code></td>
+<td>Filter by BMP peer address. An IPv4 peer matches in plain or IPv4-mapped form</td>
+</tr>
+<tr>
+<td><code>--router</code></td>
+<td>Filter by monitored router: its BMP source address or its BMP sysName</td>
+</tr>
+<tr>
+<td><code>--posture</code></td>
+<td>Filter by security posture</td>
+</tr>
+<tr>
+<td><code>--rib</code></td>
+<td>The RIB to list: <code>adj-rib-in-pre</code> (default), <code>adj-rib-in-post</code>, <code>adj-rib-out-pre</code> or <code>adj-rib-out-post</code></td>
+</tr>
+<tr>
+<td><code>--format</code></td>
+<td>Output format: <code>table</code> (default), <code>wide</code> or <code>json</code></td>
+</tr>
+</tbody>
+</table>
+<p>Every filter you give applies, so <code>--prefix 203.0.113.0/24 --peer
+198.51.100.1</code> returns that prefix from that one peer. Earlier releases
+honored only the first filter present and silently ignored the rest.
+<code>--router</code> with a sysName matches every router that reported that name.</p>
+<p><code>raven routes</code> lists one RIB at a time, Adj-RIB-In pre-policy unless you
+pass <code>--rib</code>, and every other filter applies within it. Adj-RIB-In
+pre-policy is the default because it is what your peers actually sent,
+before your import policy changed or filtered it. Use <code>--rib
+adj-rib-in-post</code> to see what survived your import policy, and <code>--rib
+adj-rib-out-pre</code> to check what your router advertises, for example
+<code>origin-invalid</code> routes your network is sending to its peers. A RIB shows
+routes only if your routers export it over BMP.</p>
+<p>The API takes the same filter as the <code>rib</code> query parameter on
+<code>/api/v1/routes</code> and <code>/api/v1/watch</code>, with the same values. On
+<code>/api/v1/routes</code> it defaults to <code>adj-rib-in-pre</code>; on <code>/api/v1/watch</code>, a
+stream without <code>rib</code> includes every RIB. An unknown value returns HTTP 400.</p>
+<p><strong>Posture values for <code>--posture</code>:</strong></p>
+<p><code>secured</code> <code>origin-only</code> <code>path-suspect</code> <code>path-only</code> <code>unverified</code> <code>origin-invalid</code></p>
+<p><strong>Example output:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>PREFIX                    ROUTER     PEER                ORIGIN   ROV       ASPA     POSTURE
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>203.0.113.0/24            edge1      198.51.100.1        AS64502  Valid     Invalid  path-suspect
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>198.51.100.0/24           edge1      192.0.2.250         AS64503  NotFound  Valid    path-only
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>2001:db8:2000::/36        edge1      198.51.100.1        AS64503  NotFound  Invalid  path-suspect
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>203.0.113.0/24            edge1      198.51.100.2        AS64502  Valid     Valid    secured
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>2001:db8:3000::/36        192.0.2.2  2001:db8::2 path 2  AS64504  NotFound  Unknown  unverified
+</code></pre></div>
+<p><code>ROUTER</code> is the router's sysName, or its address when it sent none. When the
+peer uses ADD-PATH (RFC 7911), <code>PEER</code> adds the path ID, as in
+<code>2001:db8::2 path 2</code>, because the peer can send several paths for one
+prefix and RAVEN keeps each one.</p>
+<h3 id="-format-wide">--format wide</h3>
+<p><code>--format wide</code> adds three columns that explain each route's ASPA result:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>PREFIX                    ROUTER     PEER                ORIGIN   ROV       ASPA     POSTURE       ASPA PROCEDURE  PROCEDURE SOURCE  FAILING HOP
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>203.0.113.0/24            edge1      198.51.100.1        AS64502  Valid     Invalid  path-suspect  upstream        config-asn        64501-&gt;64500
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>198.51.100.0/24           edge1      192.0.2.250         AS64503  NotFound  Valid    path-only     upstream        config-address    -
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>2001:db8:2000::/36        edge1      198.51.100.1        AS64503  NotFound  Invalid  path-suspect  upstream        config-asn        -
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>203.0.113.0/24            edge1      198.51.100.2        AS64502  Valid     Valid    secured       downstream      config-address    -
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>2001:db8:3000::/36        192.0.2.2  2001:db8::2 path 2  AS64504  NotFound  Unknown  unverified    upstream        default           -
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ASPA PROCEDURE</code></td>
+<td><code>upstream</code> or <code>downstream</code>: the verification procedure RAVEN used for this route</td>
+</tr>
+<tr>
+<td><code>PROCEDURE SOURCE</code></td>
+<td>Where the procedure came from: <code>config-address</code> (an <code>aspa-peers</code> entry for the peer address), <code>config-asn</code> (an <code>aspa-peers</code> entry for the peer ASN) or <code>default</code> (<code>aspa-default-procedure</code>)</td>
+</tr>
+<tr>
+<td><code>FAILING HOP</code></td>
+<td>For an ASPA <code>Invalid</code>, the hop that failed, as <code>customer-&gt;provider</code>: the customer AS's ASPA record does not list that provider. <code>-</code> when no hop failed</td>
+</tr>
+</tbody>
+</table>
+<p>In the example, the first route is a leak: AS64501's ASPA record does not
+list AS64500, so the hop <code>64501-&gt;64500</code> fails. The third route is <code>Invalid</code>
+with no failing hop because it failed the neighbor-AS check; <code>--format json</code>
+shows the reason in <code>aspa_reason</code>. The route from the transit provider
+(<code>198.51.100.2</code>) is verified <code>downstream</code> because an <code>aspa-peers</code> entry maps
+that address to <code>neighbor-role: provider</code>. See
+<a href="../../getting-started/concepts/#aspa-path-verification">ASPA Path Verification</a>
+and <a href="../configuration/#validationaspa-peers"><code>validation.aspa-peers</code></a>.</p>
+<h3 id="-format-json">--format json</h3>
+<p><code>--format json</code> prints the API's response unchanged: an array of route
+objects. This is the leaking route from the examples above:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">[</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="p">{</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="nt">"prefix"</span><span class="p">:</span><span class="w"> </span><span class="s2">"203.0.113.0/24"</span><span class="p">,</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="nt">"router"</span><span class="p">:</span><span class="w"> </span><span class="s2">"192.0.2.1"</span><span class="p">,</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="nt">"router_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"edge1"</span><span class="p">,</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">    </span><span class="nt">"peer"</span><span class="p">:</span><span class="w"> </span><span class="s2">"198.51.100.1"</span><span class="p">,</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="nt">"peer_asn"</span><span class="p">:</span><span class="w"> </span><span class="mi">64500</span><span class="p">,</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">    </span><span class="nt">"rib"</span><span class="p">:</span><span class="w"> </span><span class="s2">"adj-rib-in-pre"</span><span class="p">,</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">    </span><span class="nt">"origin_asn"</span><span class="p">:</span><span class="w"> </span><span class="mi">64502</span><span class="p">,</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">    </span><span class="nt">"as_path"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">      </span><span class="mi">64500</span><span class="p">,</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">      </span><span class="mi">64501</span><span class="p">,</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">      </span><span class="mi">64502</span>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="w">    </span><span class="p">],</span>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="w">    </span><span class="nt">"next_hop"</span><span class="p">:</span><span class="w"> </span><span class="s2">"198.51.100.1"</span><span class="p">,</span>
+<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="w">    </span><span class="nt">"rov"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Valid"</span><span class="p">,</span>
+<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="w">    </span><span class="nt">"rov_reason"</span><span class="p">:</span><span class="w"> </span><span class="s2">"matches VRP {203.0.113.0/24, AS64502, /24}"</span><span class="p">,</span>
+<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="w">    </span><span class="nt">"aspa"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Invalid"</span><span class="p">,</span>
+<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="w">    </span><span class="nt">"aspa_procedure"</span><span class="p">:</span><span class="w"> </span><span class="s2">"upstream"</span><span class="p">,</span>
+<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="w">    </span><span class="nt">"aspa_procedure_source"</span><span class="p">:</span><span class="w"> </span><span class="s2">"config-asn"</span><span class="p">,</span>
+<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="w">    </span><span class="nt">"aspa_failing_hop"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="w">      </span><span class="nt">"customer_asn"</span><span class="p">:</span><span class="w"> </span><span class="mi">64501</span><span class="p">,</span>
+<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a><span class="w">      </span><span class="nt">"provider_asn"</span><span class="p">:</span><span class="w"> </span><span class="mi">64500</span>
+<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a><span class="w">    </span><span class="nt">"posture"</span><span class="p">:</span><span class="w"> </span><span class="s2">"path-suspect"</span><span class="p">,</span>
+<a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a><span class="w">    </span><span class="nt">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-10-18T14:02:31Z"</span>
+<a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a><span class="p">]</span>
+</code></pre></div>
+<p>A route from a VRF peer with ADD-PATH carries <code>peer_distinguisher</code> and
+<code>path_id</code>; a route that failed the neighbor-AS check carries <code>aspa_reason</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">"prefix"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2001:db8:3000::/36"</span><span class="p">,</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nt">"router"</span><span class="p">:</span><span class="w"> </span><span class="s2">"192.0.2.2"</span><span class="p">,</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nt">"peer_distinguisher"</span><span class="p">:</span><span class="w"> </span><span class="s2">"65000:100"</span><span class="p">,</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="nt">"peer"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2001:db8::2"</span><span class="p">,</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="nt">"peer_asn"</span><span class="p">:</span><span class="w"> </span><span class="mi">64505</span><span class="p">,</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">  </span><span class="nt">"path_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">  </span><span class="nt">"rib"</span><span class="p">:</span><span class="w"> </span><span class="s2">"adj-rib-in-pre"</span><span class="p">,</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">  </span><span class="err">...</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">"prefix"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2001:db8:2000::/36"</span><span class="p">,</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="err">...</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nt">"aspa"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Invalid"</span><span class="p">,</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="nt">"aspa_procedure"</span><span class="p">:</span><span class="w"> </span><span class="s2">"upstream"</span><span class="p">,</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">  </span><span class="nt">"aspa_procedure_source"</span><span class="p">:</span><span class="w"> </span><span class="s2">"config-asn"</span><span class="p">,</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">  </span><span class="nt">"aspa_reason"</span><span class="p">:</span><span class="w"> </span><span class="s2">"neighbor-AS check failed: first AS in AS_PATH is AS64511, peer is AS64500"</span><span class="p">,</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">  </span><span class="err">...</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Route fields:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>prefix</code></td>
+<td>The route's prefix</td>
+</tr>
+<tr>
+<td><code>router</code></td>
+<td>The monitored router: the source address of its BMP session</td>
+</tr>
+<tr>
+<td><code>router_name</code></td>
+<td>The router's BMP Initiation sysName. Omitted when the router sent none</td>
+</tr>
+<tr>
+<td><code>peer_distinguisher</code></td>
+<td>The peer's VRF route distinguisher, from the BMP per-peer header. Omitted for peers in the global instance</td>
+</tr>
+<tr>
+<td><code>peer</code></td>
+<td>The BGP peer's address</td>
+</tr>
+<tr>
+<td><code>peer_asn</code></td>
+<td>The BGP peer's ASN</td>
+</tr>
+<tr>
+<td><code>path_id</code></td>
+<td>The ADD-PATH path identifier (RFC 7911). Omitted when ADD-PATH is not in effect for that peer and address family</td>
+</tr>
+<tr>
+<td><code>rib</code></td>
+<td>The RIB the route is in: <code>adj-rib-in-pre</code>, <code>adj-rib-in-post</code>, <code>adj-rib-out-pre</code> or <code>adj-rib-out-post</code>. Every route in one response has the RIB you asked for with <code>--rib</code></td>
+</tr>
+<tr>
+<td><code>origin_asn</code></td>
+<td>The origin AS: the last AS of the AS_PATH's final AS_SEQUENCE (RFC 6811 §2). <code>0</code> when the route has no origin: an empty AS_PATH, a path ending in an AS_SET (origin NONE), or a path ending in a confederation segment. The table shows <code>-</code></td>
+</tr>
+<tr>
+<td><code>as_path</code></td>
+<td>The AS_PATH, neighbor first, origin last</td>
+</tr>
+<tr>
+<td><code>next_hop</code></td>
+<td>The BGP next hop</td>
+</tr>
+<tr>
+<td><code>rov</code></td>
+<td><code>Valid</code>, <code>Invalid</code> or <code>NotFound</code></td>
+</tr>
+<tr>
+<td><code>rov_reason</code></td>
+<td>Why ROV reached its result</td>
+</tr>
+<tr>
+<td><code>aspa</code></td>
+<td><code>Valid</code>, <code>Invalid</code>, <code>Unknown</code> or <code>Unverifiable</code></td>
+</tr>
+<tr>
+<td><code>aspa_procedure</code></td>
+<td><code>upstream</code> or <code>downstream</code></td>
+</tr>
+<tr>
+<td><code>aspa_procedure_source</code></td>
+<td><code>config-address</code>, <code>config-asn</code> or <code>default</code></td>
+</tr>
+<tr>
+<td><code>aspa_reason</code></td>
+<td>Why ASPA reached its result when no hop explains it: the neighbor-AS check failed, the route is an Adj-RIB-Out route, or its AS_PATH has confederation segments. RAVEN does not ASPA-verify the last two. Omitted otherwise</td>
+</tr>
+<tr>
+<td><code>aspa_failing_hop</code></td>
+<td><code>{customer_asn, provider_asn}</code>: the hop that made ASPA <code>Invalid</code>. Omitted when no hop failed</td>
+</tr>
+<tr>
+<td><code>posture</code></td>
+<td>The combined <a href="../security-postures/">security posture</a></td>
+</tr>
+<tr>
+<td><code>timestamp</code></td>
+<td>When the monitored router received the route, from the BMP per-peer header, in RFC 3339 UTC. If the router sends a zero timestamp, RAVEN uses the time it received the BMP message instead</td>
+</tr>
+</tbody>
+</table>
+<p><code>timestamp</code> comes from the router, not from RAVEN's clock: it is when the
+monitored router received the route (RFC 7854 §4.2), not when RAVEN read
+it. When RAVEN restarts or a BMP session reconnects, the router resends its
+whole table, and a timestamp taken by RAVEN would make every route look
+seconds old. The router's timestamp keeps the route's age, so for an
+<code>origin-invalid</code> route it tells you how long the hijacked prefix has been in
+your router's table, which is what you need to judge impact. The router
+decides what it puts in this field, and a router that sends 0 gets RAVEN's
+receive time instead; compare a few routes against the router's own
+"received" time before you rely on it for route age.</p>
+<hr />
+<h2 id="raven-validate">raven validate</h2>
+<p>Show how RAVEN validated the routes it holds for one prefix, with the reason
+for each ROV result. Use it to answer "why is this prefix <code>origin-invalid</code>?"
+from the daemon's live state.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>raven<span class="w"> </span>validate<span class="w"> </span>--prefix<span class="w"> </span><span class="m">203</span>.0.113.0/24
+</code></pre></div>
+<p><code>raven validate</code> reads the route table of a running daemon, so it needs
+<code>raven serve</code> running and the prefix received over BMP. It does not validate
+a prefix the routers have not sent; for a prefix RAVEN has not seen, it
+prints <code>no routes found for prefix 203.0.113.0/24</code>.</p>
+<p><strong>Flags:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--prefix</code></td>
+<td>Prefix to look up, exact match (required)</td>
+</tr>
+<tr>
+<td><code>--origin-asn</code></td>
+<td>Not supported yet: <code>raven validate</code> exits with an error if you pass it</td>
+</tr>
+<tr>
+<td><code>--rtr</code></td>
+<td>Not supported yet: <code>raven validate</code> exits with an error if you pass it</td>
+</tr>
+</tbody>
+</table>
+<p>Both flags are reserved for one-shot validation against an RTR cache, which
+does not exist yet. Earlier releases accepted them and silently ignored
+them; RAVEN now refuses them so that you never read a result for an origin
+you did not get. With either flag, <code>raven validate</code> prints, and exits with
+status 1:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Error: --origin-asn is not supported yet; validate reads the running daemon's routes for --prefix
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Error: --rtr is not supported yet; validate reads the running daemon's routes for --prefix
+</code></pre></div>
+<p><code>raven validate</code> has no <code>--format</code> flag. For JSON, use
+<code>raven routes --prefix 203.0.113.0/24 --format json</code>.</p>
+<p><strong>Example output:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>PREFIX                    PEER          ORIGIN   ROV      POSTURE         REASON
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>203.0.113.0/24            198.51.100.1  AS64502  Valid    secured         matches VRP {203.0.113.0/24, AS64502, /24}
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>203.0.113.0/24            198.51.100.9  AS64511  Invalid  origin-invalid  origin AS64511 not authorized by any covering VRP
+</code></pre></div>
+<p>There is one row per route RAVEN holds for the prefix: one per peer, per
+router and per ADD-PATH path. <code>REASON</code> is the ROV reason: the VRP that
+matched, the origin AS that no covering VRP authorizes, or
+<code>no covering VRPs found</code>. Like <code>raven routes</code>, it lists Adj-RIB-In
+pre-policy routes.</p>
+<hr />
+<h2 id="raven-watch">raven watch</h2>
+<p>Stream route updates to your terminal as RAVEN validates them. Runs until you
+press Ctrl+C.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>raven<span class="w"> </span>watch
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>raven<span class="w"> </span>watch<span class="w"> </span>--posture<span class="w"> </span>path-suspect
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>raven<span class="w"> </span>watch<span class="w"> </span>--router<span class="w"> </span>edge1<span class="w"> </span>--posture<span class="w"> </span>origin-invalid
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>raven<span class="w"> </span>watch<span class="w"> </span>--peer<span class="w"> </span><span class="m">198</span>.51.100.1
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>raven<span class="w"> </span>watch<span class="w"> </span>--prefix<span class="w"> </span><span class="m">203</span>.0.113.0/24<span class="w"> </span>--origin-asn<span class="w"> </span><span class="m">64502</span>
+</code></pre></div>
+<p><strong>Flags:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--prefix</code></td>
+<td>Only stream routes for this prefix</td>
+</tr>
+<tr>
+<td><code>--origin-asn</code></td>
+<td>Only stream routes with this origin ASN</td>
+</tr>
+<tr>
+<td><code>--peer</code></td>
+<td>Only stream routes from this BMP peer</td>
+</tr>
+<tr>
+<td><code>--router</code></td>
+<td>Only stream routes from this monitored router: its address or BMP sysName</td>
+</tr>
+<tr>
+<td><code>--posture</code></td>
+<td>Only stream routes with this posture</td>
+</tr>
+</tbody>
+</table>
+<p>Every filter you give applies, as with <code>raven routes</code>. Earlier releases sent
+only <code>--posture</code> to the daemon and ignored the other filters.</p>
+<p><strong>Example output:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>watching for route events... (Ctrl+C to stop)
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>[path-suspect] 203.0.113.0/24 via 198.51.100.1 origin:AS64502 AS_PATH:[64500 64501 64502] rov:Valid posture:path-suspect
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Run <code>raven watch --posture path-suspect</code> in a spare terminal during an
+incident. It shows leaked routes the moment RAVEN validates them.</p>
+</div>
+<hr />
+<h2 id="raven-aspa">raven aspa</h2>
+<p>Show ASPA records for a specific ASN from the local ASPA store.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>raven<span class="w"> </span>aspa<span class="w"> </span>--asn<span class="w"> </span><span class="m">13335</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>raven<span class="w"> </span>aspa<span class="w"> </span>--asn<span class="w"> </span><span class="m">13335</span><span class="w"> </span>--format<span class="w"> </span>json
+</code></pre></div>
+<p><strong>Flags:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--asn</code></td>
+<td>ASN to look up (required)</td>
+</tr>
+<tr>
+<td><code>--format</code></td>
+<td>Output format: <code>table</code> or <code>json</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example output:</strong>
+ASPA RECORD — AS13335
+─────────────────────────────────
+Provider set (3):
+AS174
+AS1299
+AS3356</p>
+<p>If the ASN has no ASPA record in the current RTR cache, RAVEN will say so.</p>
+<hr />
+<h2 id="raven-aspa-recommend">raven aspa recommend</h2>
+<p>Analyse observed AS_PATHs from your BMP feeds and suggest which ASPA objects
+your neighbours should create. Based on heuristics — verify with your peers
+before acting on suggestions.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>raven<span class="w"> </span>aspa<span class="w"> </span>recommend
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>raven<span class="w"> </span>aspa<span class="w"> </span>recommend<span class="w"> </span>--peer<span class="w"> </span><span class="m">192</span>.168.1.1
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>raven<span class="w"> </span>aspa<span class="w"> </span>recommend<span class="w"> </span>--asn<span class="w"> </span><span class="m">64500</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>raven<span class="w"> </span>aspa<span class="w"> </span>recommend<span class="w"> </span>--min-observations<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>raven<span class="w"> </span>aspa<span class="w"> </span>recommend<span class="w"> </span>--top<span class="w"> </span><span class="m">20</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>raven<span class="w"> </span>aspa<span class="w"> </span>recommend<span class="w"> </span>--format<span class="w"> </span>json
+</code></pre></div>
+<p><strong>Flags:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--peer</code></td>
+<td>Restrict analysis to routes from a specific peer IP</td>
+</tr>
+<tr>
+<td><code>--asn</code></td>
+<td>Show suggestions for a specific customer ASN</td>
+</tr>
+<tr>
+<td><code>--min-observations</code></td>
+<td>Minimum route observations to include a relationship (default: 1)</td>
+</tr>
+<tr>
+<td><code>--top</code></td>
+<td>Show top N suggestions, default 20 (0 = all)</td>
+</tr>
+<tr>
+<td><code>--include-existing</code></td>
+<td>Include ASNs that already have complete ASPA coverage</td>
+</tr>
+<tr>
+<td><code>--format</code></td>
+<td>Output format: <code>table</code> or <code>json</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example output:</strong>
+ASPA OBJECT RECOMMENDATIONS (3)
+Note: heuristic — based on observed AS_PATHs only. Verify with your peers.
+┌─ AS64500  [no ASPA record]  confidence: 80%  observations: 1423
+│  SUGGESTED PROVIDER    OBSERVED      STATUS
+│  AS1299                892 routes    ✗ MISSING
+│  AS3356                531 routes    ✗ MISSING
+└──────────────────────────────────────────────────
+┌─ AS64501  [existing ASPA (1 providers)]  confidence: 70%  observations: 203
+│  SUGGESTED PROVIDER    OBSERVED      STATUS
+│  AS174                 203 routes    ✗ MISSING
+│  AS1299                203 routes    ✓ in ASPA
+└──────────────────────────────────────────────────</p>
+<p><strong>Confidence score</strong> is a heuristic based on observation count and provider
+count. Higher is more reliable. Scores above 70% are generally trustworthy.
+Always verify with your peers before creating ASPA objects.</p>
+<hr />
+<h2 id="raven-what-if">raven what-if</h2>
+<p>Simulate the impact of deploying routing security policies without changing
+anything on your routers.</p>
+<h3 id="-reject-invalid">--reject-invalid</h3>
+<p>Simulate deploying reject-invalid ROV policy:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>raven<span class="w"> </span>what-if<span class="w"> </span>--reject-invalid
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>raven<span class="w"> </span>what-if<span class="w"> </span>--reject-invalid<span class="w"> </span>--peer<span class="w"> </span><span class="m">192</span>.168.1.1
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>raven<span class="w"> </span>what-if<span class="w"> </span>--reject-invalid<span class="w"> </span>--format<span class="w"> </span>json
+</code></pre></div>
+<p><strong>Example output:</strong>
+REJECT-INVALID IMPACT SUMMARY
+─────────────────────────────────────────────────
+Routes currently received:     1,044,293
+Routes that would be rejected: 2,341 (0.22%)
+Prefixes affected:             1,892
+Unique origin ASNs affected:   487
+TOP AFFECTED ORIGIN ASNs
+ORIGIN ASN   ROUTES  PREFIXES  REASON
+AS64666      142     142       Origin AS mismatch
+AS64667      89      89        maxLength exceeded
+AS64668      71      71        Origin AS mismatch</p>
+<h3 id="-aspa-enforce">--aspa-enforce</h3>
+<p>Simulate dropping all path-suspect routes:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>raven<span class="w"> </span>what-if<span class="w"> </span>--aspa-enforce
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>raven<span class="w"> </span>what-if<span class="w"> </span>--aspa-enforce<span class="w"> </span>--format<span class="w"> </span>json
+</code></pre></div>
+<p><strong>Example output:</strong>
+ASPA ENFORCEMENT IMPACT SUMMARY
+─────────────────────────────────────────────────
+Routes currently received:     1,044,293
+Routes with path-suspect:      12 (0.00%) ← would be dropped
+Routes with no ASPA coverage:  891,203 (85.3%) ← unverifiable today
+Prefixes affected:             10
+Unique origin ASNs affected:   8
+TOP FAILING AS_PATH HOPS
+CUSTOMER ASN    UNAUTH PROVIDER  ROUTES AFFECTED
+AS3356          AS7018           8
+AS1299          AS3257           4</p>
+<p><strong>Flags:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--reject-invalid</code></td>
+<td>Simulate reject-invalid ROV policy</td>
+</tr>
+<tr>
+<td><code>--aspa-enforce</code></td>
+<td>Simulate ASPA enforcement policy</td>
+</tr>
+<tr>
+<td><code>--peer</code></td>
+<td>Restrict simulation to routes from a specific peer</td>
+</tr>
+<tr>
+<td><code>--format</code></td>
+<td>Output format: <code>table</code> or <code>json</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="raven-version">raven version</h2>
+<p>Show RAVEN version and build information.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>raven<span class="w"> </span>version
+</code></pre></div>
+raven version v0.1.0 (commit: abc1234, built: 2026-04-15T00:00:00Z)</p>
+<hr />
+<h2 id="raven-audit">raven audit</h2>
+<p>Generate a read-only security posture report for a router. Shows ROV/ASPA
+coverage, per-peer posture breakdown, top offending ASNs, and actionable
+recommendations.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>raven<span class="w"> </span>audit<span class="w"> </span>--router<span class="w"> </span><span class="m">10</span>.0.0.1
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>raven<span class="w"> </span>audit<span class="w"> </span>--router<span class="w"> </span><span class="m">10</span>.0.0.1<span class="w"> </span>--format<span class="w"> </span>json
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>raven<span class="w"> </span>audit<span class="w"> </span>--router<span class="w"> </span><span class="m">10</span>.0.0.1<span class="w"> </span>--format<span class="w"> </span>markdown
+</code></pre></div>
+<p><strong>Flags:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--router</code></td>
+<td>Peer IP address to audit (required)</td>
+</tr>
+<tr>
+<td><code>--format</code></td>
+<td>Output format: <code>table</code>, <code>json</code>, or <code>markdown</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example output:</strong>
+Router: 10.0.0.1
+Total Routes: 5
+ROV Coverage:  80.0%
+ASPA Coverage: 0.0%
+POSTURE          COUNT
+origin-only      3   (60%)
+unverified       1   (20%)
+origin-invalid   1   (20%)
+TOP OFFENDERS
+AS65001   1 route   origin-invalid   10.10.0.0/24
+RECOMMENDATIONS</p>
+<p>1 origin-invalid route — run raven what-if --reject-invalid
+ASPA coverage 0% — register ASPA objects at your RIR</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Run <code>raven audit</code> weekly in a cron job with <code>--format json</code> to track
+your security posture over time. Use <code>--format markdown</code> for NOC reports
+and incident post-mortems.</p>
+</div>
+<hr />
+<h2 id="raven-check-stealthy">raven check stealthy</h2>
+<p>Detects stealthy BGP hijacks by comparing the control-plane BMP RIB view
+against actual data-plane forwarding using probes. A diverging first-hop ASN
+indicates traffic is being routed through a different network than BGP
+advertises — invisible to the control plane alone.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>raven<span class="w"> </span>check<span class="w"> </span>stealthy<span class="w"> </span>--prefix<span class="w"> </span><span class="m">203</span>.0.113.0/24
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>raven<span class="w"> </span>check<span class="w"> </span>stealthy<span class="w"> </span>--prefix<span class="w"> </span><span class="m">203</span>.0.113.0/24<span class="w"> </span>--probe-via<span class="w"> </span>clab-raven-demo-edge
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>raven<span class="w"> </span>check<span class="w"> </span>stealthy<span class="w"> </span>--prefix<span class="w"> </span><span class="m">203</span>.0.113.0/24<span class="w"> </span>--probe-count<span class="w"> </span><span class="m">5</span><span class="w"> </span>--timeout<span class="w"> </span>5s
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>raven<span class="w"> </span>check<span class="w"> </span>stealthy<span class="w"> </span>--prefix<span class="w"> </span><span class="m">203</span>.0.113.0/24<span class="w"> </span>--format<span class="w"> </span>json
+</code></pre></div>
+<p><strong>Flags:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--prefix</code></td>
+<td>required</td>
+<td>Prefix to probe (CIDR)</td>
+</tr>
+<tr>
+<td><code>--probe-count</code></td>
+<td>3</td>
+<td>Number of probes to send</td>
+</tr>
+<tr>
+<td><code>--timeout</code></td>
+<td>3s</td>
+<td>Probe timeout per probe</td>
+</tr>
+<tr>
+<td><code>--probe-via</code></td>
+<td>—</td>
+<td>Run traceroute from inside a Docker container (for topologies where the host is outside BGP forwarding)</td>
+</tr>
+<tr>
+<td><code>--format</code></td>
+<td>table</td>
+<td>Output format: <code>table</code> or <code>json</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Verdicts:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Verdict</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CLEAN</code></td>
+<td>Data-plane first hop matches BMP RIB expected AS</td>
+</tr>
+<tr>
+<td><code>STEALTHY HIJACK DETECTED</code></td>
+<td>First hop AS differs from BMP RIB — traffic diverted</td>
+</tr>
+<tr>
+<td><code>DIVERGENCE</code></td>
+<td>First hop not in BMP peer table — unconfirmed divergence</td>
+</tr>
+<tr>
+<td><code>INCONCLUSIVE</code></td>
+<td>All probes timed out</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example — clean baseline:</strong>
+$ raven check stealthy --prefix 203.0.113.0/24 --probe-via clab-raven-demo-edge
+Checking control/data-plane divergence for 203.0.113.0/24...
+Control plane (BMP/RIB):
+  Route    : 203.0.113.0/24 via AS65000 (origin-only)
+  RIB state: CLEAN — ROV Valid, no path violations
+Data plane probe (traceroute from clab-raven-demo-edge to 203.0.113.1):
+  Probe 1  : TTL-exceeded at 10.0.0.1 (AS65000 — expected)
+  Probe 2  : TTL-exceeded at 10.0.0.1 (AS65000 — expected)
+  Probe 3  : TTL-exceeded at 10.0.0.1 (AS65000 — expected)
+╔══════════════════════════════════════════════════════╗
+║ CLEAN: Data-plane path matches BMP RIB               ║
+║ RIB says: AS65000 │ Traffic goes to: AS65000         ║
+╚══════════════════════════════════════════════════════╝</p>
+<p><strong>Example — stealthy hijack detected:</strong>
+$ raven check stealthy --prefix 203.0.113.0/24 --probe-via clab-raven-demo-edge
+Checking control/data-plane divergence for 203.0.113.0/24...
+Control plane (BMP/RIB):
+  Route    : 203.0.113.0/24 via AS65000 (origin-only)
+  RIB state: CLEAN — ROV Valid, no path violations
+Data plane probe (traceroute from clab-raven-demo-edge to 203.0.113.1):
+  Probe 1  : TTL-exceeded at 10.0.3.2 (AS65099 — ATTACKER)
+  Probe 2  : TTL-exceeded at 10.0.3.2 (AS65099 — ATTACKER)
+  Probe 3  : TTL-exceeded at 10.0.3.2 (AS65099 — ATTACKER)
+╔═════════════════════════════════════════════════════════╗
+║ STEALTHY HIJACK DETECTED: control/data-plane divergence ║
+║ RIB says: AS65000 │ Traffic goes to: AS65099            ║
+╚═════════════════════════════════════════════════════════╝</p>
+<p><strong>Note on permissions:</strong> Raw ICMP requires <code>CAP_NET_RAW</code> or root. Grant it
+without sudo:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>sudo<span class="w"> </span>setcap<span class="w"> </span><span class="nv">cap_net_raw</span><span class="o">=</span>eip<span class="w"> </span>./raven
+</code></pre></div>
+<p>If ICMP fails, RAVEN automatically falls back to TCP SYN probes on port 80.
+Use <code>--probe-via</code> to run probes from inside a container that is part of the
+BGP topology.</p>
+<hr />
+<h2 id="raven-check-global">raven check global</h2>
+<p>Correlates a prefix's local BMP-observed origin against the origin ASNs that
+third-party route collectors see for it, via the
+<a href="https://stat.ripe.net/docs/02.data-api/looking-glass.html">RIPEstat looking-glass data call</a>.</p>
+<p>RAVEN's ROV and ASPA validation is local-vantage-point only: it knows what
+your own BMP-attached routers received. That cannot tell you whether a
+suspicious route is a real hijack the rest of the internet also sees, or a
+purely local leak or misconfiguration. This check answers that question.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>raven<span class="w"> </span>check<span class="w"> </span>global<span class="w"> </span>--prefix<span class="w"> </span><span class="m">203</span>.0.113.0/24
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>raven<span class="w"> </span>check<span class="w"> </span>global<span class="w"> </span>--prefix<span class="w"> </span><span class="m">203</span>.0.113.0/24<span class="w"> </span>--origin-asn<span class="w"> </span><span class="m">64511</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>raven<span class="w"> </span>check<span class="w"> </span>global<span class="w"> </span>--prefix<span class="w"> </span><span class="m">203</span>.0.113.0/24<span class="w"> </span>--format<span class="w"> </span>json
+</code></pre></div>
+<p><strong>Flags:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--prefix</code></td>
+<td>required</td>
+<td>Prefix to correlate (CIDR)</td>
+</tr>
+<tr>
+<td><code>--origin-asn</code></td>
+<td>—</td>
+<td>Origin ASN to compare against. Defaults to the daemon's BMP-observed origin for the prefix</td>
+</tr>
+<tr>
+<td><code>--format</code></td>
+<td>table</td>
+<td>Output format: <code>table</code> or <code>json</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Verdicts:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Verdict</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MATCH</code></td>
+<td>The local origin is the single most-observed origin globally — the route looks the same from outside</td>
+</tr>
+<tr>
+<td><code>DIVERGENT</code></td>
+<td>The world's majority origin is not the local origin, or the local origin is only tied for most-observed (a MOAS conflict)</td>
+</tr>
+<tr>
+<td><code>LOCAL_ONLY</code></td>
+<td>No collector sees this prefix at all — points at a local leak or misconfiguration, not a propagated hijack</td>
+</tr>
+<tr>
+<td><code>INCONCLUSIVE</code></td>
+<td>The query failed, timed out, returned malformed data, or there was no local origin to compare against</td>
+</tr>
+</tbody>
+</table>
+<p><code>MATCH</code> requires a strict majority. A tie between the local origin and
+another ASN is reported as <code>DIVERGENT</code>: a MOAS conflict at equal global
+visibility still warrants a look.</p>
+<p><strong>Example — global match:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>$ raven check global --prefix 8.8.8.0/24
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>Correlating global visibility for 8.8.8.0/24...
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>Local view (BMP/RIB):
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>  Route   : 8.8.8.0/24 via AS15169 (secured)
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>  Peer    : 10.0.0.1 (AS65000), 1 route(s) in RIB
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>  Local   : ROV Valid, ASPA Valid
+<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a>
+<a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a>Global view (RIPEstat looking-glass, https://stat.ripe.net):
+<a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a>  ORIGIN   COLLECTOR PEERS  SHARE  NOTE
+<a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a>  AS15169  368              100%   matches local
+<a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a>  368 collector peer observations in 608ms
+<a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a>
+<a id="__codelineno-28-14" name="__codelineno-28-14" href="#__codelineno-28-14"></a>╔═══════════════════════════════════════════════════════════════════════════════════╗
+<a id="__codelineno-28-15" name="__codelineno-28-15" href="#__codelineno-28-15"></a>║ GLOBAL MATCH: Global majority origin matches local BMP view (368 collector peers) ║
+<a id="__codelineno-28-16" name="__codelineno-28-16" href="#__codelineno-28-16"></a>║ Local RIB says: AS15169 │ The internet says: AS15169                              ║
+<a id="__codelineno-28-17" name="__codelineno-28-17" href="#__codelineno-28-17"></a>╚═══════════════════════════════════════════════════════════════════════════════════╝
+</code></pre></div>
+<p><strong>Example — global divergence (the hijack is real and propagated):</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>$ raven check global --prefix 203.0.113.0/24
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>Correlating global visibility for 203.0.113.0/24...
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>Local view (BMP/RIB):
+<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>  Route   : 203.0.113.0/24 via AS64511 (origin-invalid)
+<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a>  Peer    : 10.0.3.2 (AS65099), 1 route(s) in RIB
+<a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a>  Local   : ROV Invalid, ASPA Unknown
+<a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a>
+<a id="__codelineno-29-9" name="__codelineno-29-9" href="#__codelineno-29-9"></a>Global view (RIPEstat looking-glass, https://stat.ripe.net):
+<a id="__codelineno-29-10" name="__codelineno-29-10" href="#__codelineno-29-10"></a>  ORIGIN   COLLECTOR PEERS  SHARE  NOTE
+<a id="__codelineno-29-11" name="__codelineno-29-11" href="#__codelineno-29-11"></a>  AS65000  18               82%
+<a id="__codelineno-29-12" name="__codelineno-29-12" href="#__codelineno-29-12"></a>  AS64511  4                18%    matches local
+<a id="__codelineno-29-13" name="__codelineno-29-13" href="#__codelineno-29-13"></a>  22 collector peer observations in 512ms
+<a id="__codelineno-29-14" name="__codelineno-29-14" href="#__codelineno-29-14"></a>
+<a id="__codelineno-29-15" name="__codelineno-29-15" href="#__codelineno-29-15"></a>╔════════════════════════════════════════════════════════════════════════════════════════╗
+<a id="__codelineno-29-16" name="__codelineno-29-16" href="#__codelineno-29-16"></a>║ GLOBAL DIVERGENCE DETECTED: MOAS conflict — 2 origins seen globally, most-observed ...  ║
+<a id="__codelineno-29-17" name="__codelineno-29-17" href="#__codelineno-29-17"></a>║ Local RIB says: AS64511 │ The internet says: AS65000                                    ║
+<a id="__codelineno-29-18" name="__codelineno-29-18" href="#__codelineno-29-18"></a>╚════════════════════════════════════════════════════════════════════════════════════════╝
+</code></pre></div>
+<p><strong>Example — local-only route (a leak, not a hijack):</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>$ raven check global --prefix 203.0.113.0/24 --origin-asn 64511
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>Global view (RIPEstat looking-glass, https://stat.ripe.net):
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>  no observations — no route collector carries this prefix
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>║ LOCAL-ONLY ROUTE: No collector sees this prefix — a local leak or misconfiguration, not a propagated hijack  ║
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a>║ Local RIB says: AS64511 │ The internet says: nobody                                                         ║
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+</code></pre></div>
+<p><strong>Notes:</strong></p>
+<ul>
+<li>The looking-glass call is <strong>exact-match</strong>. A more-specific prefix that no
+  collector carries returns no observations, which is exactly the
+  <code>LOCAL_ONLY</code> signal — not a query failure.</li>
+<li><strong>Collector peers, not collectors.</strong> Counts are in units of one
+  (route collector, peer address) pair, so a single RIS collector peering
+  with 30 networks contributes up to 30 observations.</li>
+<li>This command reads <code>external.ripestat</code> from <code>raven.yaml</code> for the base URL,
+  timeout, cache TTL and rate limit, but does <strong>not</strong> require
+  <code>external.ripestat.enabled: true</code> — invoking it is itself the explicit
+  opt-in. The <code>enabled</code> flag gates only the Event Engine's automatic
+  correlation. See
+  <a href="../configuration/#external-correlation-ripestat">Configuration → External Correlation</a>.</li>
+<li>Without <code>--origin-asn</code> the baseline comes from the daemon's RIB, so
+  <code>raven serve</code> must be reachable. With <code>--origin-asn</code> the check works
+  against no daemon at all.</li>
+<li>It is <strong>fail-open</strong>: an unreachable or malformed RIPEstat degrades to
+  <code>INCONCLUSIVE</code> and exits 0. The result is a standalone annotation and does
+  not change the route's <a href="../security-postures/">security posture</a>.</li>
+</ul>
+<hr />
+<h2 id="raven-flowspec-list">raven flowspec list</h2>
+<p>Show all active Flowspec mitigation rules in RAVEN's registry. Displays
+the rule key, action, dry-run state, remaining TTL, and insertion time.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>raven<span class="w"> </span>flowspec<span class="w"> </span>list
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>raven<span class="w"> </span>flowspec<span class="w"> </span>list<span class="w"> </span>--format<span class="w"> </span>json
+</code></pre></div>
+<p><strong>Flags:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--format</code></td>
+<td>Output format: <code>table</code> or <code>json</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example output:</strong>
+RAVEN Flowspec Rules
+════════════════════════════════════════════════════════
+KEY                            ACTION  DRY-RUN  TTL        INSERTED
+192.0.2.0/24|drop              drop    yes      4m50s      2026-05-06 14:23:01
+10.10.0.0/24|drop              drop    yes      3m55s      2026-05-06 14:24:23
+2 active rules  (dry-run mode — no live injection)</p>
+<p>Rules are created automatically by the Event Engine when a route matches
+a configured <code>flowspec</code> action. Rules in <code>dry-run</code> mode are tracked but
+not injected into GoBGP until toggled live with <code>raven flowspec toggle</code>.</p>
+<hr />
+<h2 id="raven-flowspec-toggle">raven flowspec toggle</h2>
+<p>Toggle a Flowspec rule between dry-run and live GoBGP injection. When
+toggled to live, RAVEN calls GoBGP's AddPath API to inject the rule.
+Toggle again to withdraw and return to dry-run.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>raven<span class="w"> </span>flowspec<span class="w"> </span>toggle<span class="w"> </span><span class="s2">"192.0.2.0/24|drop"</span>
+</code></pre></div>
+<p><strong>Arguments:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;key&gt;</code></td>
+<td>Rule key as shown in <code>raven flowspec list</code> (required)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example — toggling to live:</strong>
+Rule: 192.0.2.0/24|drop
+Dry-run: yes → LIVE
+⚠  Live injection enabled. Flowspec rule is now active in GoBGP.
+Run 'raven flowspec toggle "192.0.2.0/24|drop"' again to
+withdraw and return to dry-run mode.</p>
+<p><strong>Example — withdrawing:</strong>
+Rule: 192.0.2.0/24|drop
+Dry-run: LIVE → yes (withdrawn from GoBGP)</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Live injection sends a Flowspec route to GoBGP which will propagate
+it to any configured BGP peers. Only toggle to live when you intend
+to apply the mitigation. The rule will auto-expire after the
+configured TTL (default: 5 minutes).</p>
+</div>
+<hr />
+<h2 id="raven-rtr">raven rtr</h2>
+<p>Parent command group for RTR (RPKI-to-Router) cache session tools. It has no
+action of its own — run it bare to list the subcommands.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>raven<span class="w"> </span>rtr
+</code></pre></div>
+<p><strong>Subcommands:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>raven rtr monitor</code></td>
+<td>Observe an RTR cache session, log telemetry to NDJSON, and detect anomalies</td>
+</tr>
+<tr>
+<td><code>raven rtr seed-baseline</code></td>
+<td>Build an anomaly-detector baseline snapshot from recorded telemetry</td>
+</tr>
+</tbody>
+</table>
+<p>These commands are <strong>standalone</strong> — they connect directly to an RTR cache and
+do not require a running <code>raven serve</code> daemon or a config file.</p>
+<hr />
+<h2 id="raven-rtr-monitor">raven rtr monitor</h2>
+<p>Connect to a single RTR cache, record session lifecycle and sync events as
+NDJSON, and run the adaptive anomaly detector over the sync stream. It keeps
+in-memory VRP/ASPA stores only to drive the RTR client — no BMP ingestion or
+route validation happens here. Every setting comes from flags; no config file
+is read.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>raven<span class="w"> </span>rtr<span class="w"> </span>monitor<span class="w"> </span>--cache<span class="w"> </span>localhost:3323<span class="w"> </span>--log-file<span class="w"> </span>rtr-telemetry.ndjson
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>raven<span class="w"> </span>rtr<span class="w"> </span>monitor<span class="w"> </span>--cache<span class="w"> </span>rpki.example.com:3323<span class="w"> </span>--transport<span class="w"> </span>tls
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>raven<span class="w"> </span>rtr<span class="w"> </span>monitor<span class="w"> </span>--log-file<span class="w"> </span>/tmp/rtr.ndjson<span class="w"> </span>--prometheus<span class="w"> </span>:9595
+<a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a>raven<span class="w"> </span>rtr<span class="w"> </span>monitor<span class="w"> </span>--anomaly-snapshot<span class="w"> </span>~/.raven/anomaly-baseline.json<span class="w"> </span>--prometheus<span class="w"> </span>:9595
+</code></pre></div>
+<p>Runs in the foreground until you press Ctrl+C.</p>
+<p><strong>Flags:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--cache</code></td>
+<td><code>localhost:3323</code></td>
+<td>RTR cache address</td>
+</tr>
+<tr>
+<td><code>--log-file</code></td>
+<td><code>rtr-telemetry.ndjson</code></td>
+<td>Path to the NDJSON telemetry output file (created if absent, appended if present)</td>
+</tr>
+<tr>
+<td><code>--transport</code></td>
+<td><code>tcp</code></td>
+<td>RTR transport: <code>tcp</code> or <code>tls</code></td>
+</tr>
+<tr>
+<td><code>--prometheus</code></td>
+<td>—</td>
+<td>Prometheus listen address (e.g. <code>:9595</code>); empty disables the metrics endpoint</td>
+</tr>
+<tr>
+<td><code>--anomaly-snapshot</code></td>
+<td><code>~/.raven/anomaly-baseline.json</code></td>
+<td>Path to the adaptive anomaly-detector baseline snapshot (JSON)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Anomaly detection:</strong></p>
+<ul>
+<li>The detector <strong>warm-starts</strong> from the baseline snapshot at <code>--anomaly-snapshot</code>
+  if one exists. A missing or unreadable snapshot degrades to a cold start —
+  it never blocks startup. Seed a snapshot ahead of time with
+  <code>raven rtr seed-baseline</code> to skip the live warm-up.</li>
+<li>Each incremental sync is scored against rolling per-metric windows
+  (<code>interval_since_ns</code>, <code>sync_duration_ns</code>, <code>vrp_announced</code>, <code>vrp_withdrawn</code>,
+  <code>aspa_announced</code>, <code>aspa_withdrawn</code>) using median/MAD adaptive thresholds.</li>
+<li><strong>Full resyncs are recorded but not evaluated</strong> — a full table dump reports
+  nearly the entire VRP/ASPA set as "announced", which is not comparable to
+  incremental deltas and would trip a false positive.</li>
+<li>When an anomaly fires it is written to the NDJSON sink as an <code>anomaly</code> record
+  and, if <code>--prometheus</code> is set, increments <code>raven_rtr_anomaly_total{cache,severity}</code>
+  and sets <code>raven_rtr_anomaly_last_timestamp{cache}</code>. See
+  <a href="../observability/">Observability &amp; Metrics</a> for the metric reference.</li>
+<li>The baseline is saved periodically and again on graceful shutdown, so a
+  restarted monitor resumes from where it left off.</li>
+</ul>
+<p><strong>Watching for anomalies live:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>tail<span class="w"> </span>-f<span class="w"> </span>rtr-telemetry.ndjson<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">'"event_type":"anomaly"'</span>
+</code></pre></div>
+<hr />
+<h2 id="raven-rtr-seed-baseline">raven rtr seed-baseline</h2>
+<p>Replay a recorded NDJSON telemetry file through the anomaly detector's rolling
+windows and write the resulting baseline snapshot. Run it once against an
+existing collection to produce a reusable baseline that
+<code>raven rtr monitor --anomaly-snapshot</code> loads on startup, skipping the live
+warm-up period.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>raven<span class="w"> </span>rtr<span class="w"> </span>seed-baseline<span class="w"> </span>--input<span class="w"> </span>rtr-baseline.ndjson
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>raven<span class="w"> </span>rtr<span class="w"> </span>seed-baseline<span class="w"> </span>--input<span class="w"> </span>rtr-baseline.ndjson<span class="w"> </span>--output<span class="w"> </span>~/.raven/anomaly-baseline.json
+</code></pre></div>
+<p>Only <strong>sync</strong> records populate the windows; connected/disconnected and
+structural (reset/error) records are ignored, and full syncs are skipped. The
+input is treated as ground-truth-normal, so no anomalies are reported during
+seeding.</p>
+<p><strong>Flags:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--input</code></td>
+<td>required</td>
+<td>Path to the recorded NDJSON telemetry file to seed from</td>
+</tr>
+<tr>
+<td><code>--output</code></td>
+<td><code>~/.raven/anomaly-baseline.json</code></td>
+<td>Path to write the baseline snapshot to</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example output:</strong>
+lines processed: 40320
+sync records:    1342 (7 full syncs skipped)
+window fill levels for localhost:3323:
+  interval_since_ns: 500/500 (full)
+  sync_duration_ns:  500/500 (full)
+  vrp_announced:     500/500 (full)
+  vrp_withdrawn:     500/500 (full)
+  aspa_announced:    500/500 (full)
+  aspa_withdrawn:    500/500 (full)
+output: /home/user/.raven/anomaly-baseline.json</p>
+<p>A window that reaches its cap (500 samples) reports <code>(full)</code> — the detector has
+a complete baseline for that metric. Partially-filled windows still work but
+give the detector less history to reason about.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The typical workflow is: record telemetry with <code>raven rtr monitor</code> over a
+representative period, run <code>raven rtr seed-baseline</code> against that file once,
+then start the live monitor with <code>--anomaly-snapshot</code> pointed at the seeded
+baseline so it detects from the first sync.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/nokia/bgp-routing-security-monitor" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
