@@ -207,7 +207,9 @@ relying parties. RAVEN maintains a persistent RTR session to your validator
 and keeps a local copy of all VRP and ASPA data, updated incrementally as
 the validator's data changes.
 
-RTR v2 adds ASPA PDU support. Routinator with `--enable-aspa` speaks RTR v2.
+RTR v2 adds ASPA PDU support. Routinator 0.16 and later serve ASPA over RTR
+v2 by default; Routinator 0.15.x and older do so only when started with
+`--enable-aspa` (or `enable-aspa = true` in the config file).
 
 ## The Security Posture Model
 
