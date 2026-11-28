@@ -64,7 +64,7 @@ sudo mv raven /usr/local/bin/
 |---|---|
 | **Routers** | Any BMP-capable router — SR Linux, SR OS, Junos, IOS-XR, Arista EOS, FRR |
 | **RPKI Validator** | Any RTR-speaking validator — Routinator, rpki-client, FORT |
-| **ASPA** | Routinator with `--enable-aspa` for RTR v2 + ASPA PDU support |
+| **ASPA** | Routinator 0.16 or later (ASPA on by default), or Routinator 0.15.x and older started with `--enable-aspa`, for RTR v2 + ASPA PDU support |
 | **Ports** | BMP listener: `11019/tcp`, API: `11020/tcp`, Prometheus: `9595/tcp` |
 
 ## RPKI Validator Setup
@@ -72,11 +72,28 @@ sudo mv raven /usr/local/bin/
 RAVEN consumes VRP and ASPA data from your existing RPKI validator via RTR.
 It does not replace your validator — it connects to it.
 
-For ASPA support, you need **Routinator** with RTR v2 enabled:
+For ASPA support, you need **Routinator** serving ASPA over RTR v2. How you
+turn ASPA on depends on the Routinator version (`routinator --version`).
+
+Routinator 0.16 and later process ASPA by default, so you set nothing:
 
 ```bash
-routinator server --enable-aspa --rtr 127.0.0.1:3323
+routinator server --rtr 127.0.0.1:3323
 ```
+
+`--disable-aspa`, or `enable-aspa = false` in the config file, turns ASPA
+off. Do not use either for RAVEN.
+
+Routinator 0.15.x and older need `--enable-aspa` before the `server`
+command, or `enable-aspa = true` in the config file:
+
+```bash
+routinator --enable-aspa server --rtr 127.0.0.1:3323
+```
+
+Routinator 0.16 rejects `--enable-aspa` as an unknown option. It still
+accepts `enable-aspa = true` in the config file, so a config file with that
+line works with both versions.
 
 !!! note
     Routinator takes approximately 4 minutes for a cold start while it syncs
